@@ -102,7 +102,7 @@
             background-color: rgb(0, 174, 255);
             border-radius: 5px;
             color: black;
-            padding: 15x 32px;
+            padding: 20px 40px;
             text-align: center;
             text-decoration: none;
             display: inline-block;
@@ -129,6 +129,10 @@
     <div class="bottom-container">
         <button id="resetBtn" class="button">重新开始</button>
         <div id="stepDom" class="step">步数：</div>
+        <button id="upBtn" class="button">上</button>
+        <button id="downBtn" class="button">下</button>
+        <button id="leftBtn" class="button">左</button>
+        <button id="rightBtn" class="button">右</button>
     </div>
     <h2> <a href="index.html">更多游戏</a></h2>
     <script type="text/javascript">
@@ -450,6 +454,22 @@
             var resetBtn = document.getElementById("resetBtn");
             resetBtn.addEventListener("click", function () {
                 location.reload();
+            });
+
+            document.getElementById("upBtn").addEventListener("click", function () {
+                movePlayer("up");
+            });
+
+            document.getElementById("downBtn").addEventListener("click", function () {
+                movePlayer("down");
+            });
+
+            document.getElementById("leftBtn").addEventListener("click", function () {
+                movePlayer("left");
+            });
+
+            document.getElementById("rightBtn").addEventListener("click", function () {
+                movePlayer("right");
             });
         }
 
