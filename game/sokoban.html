@@ -98,6 +98,19 @@
             margin-top: 20px;
         }
 
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .button-container>div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
         .button {
             background-color: rgb(0, 174, 255);
             border-radius: 5px;
@@ -112,13 +125,14 @@
         }
 
         .step {
-            position: absolute;
             font-size: 20px;
             color: #333;
             padding: 15px 32px;
             margin: 4px 2px;
-            display: inline-block;
-            left: 100px;
+            display: flex;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
             /* 新增 */
         }
     </style>
@@ -127,12 +141,20 @@
 <body>
     <div id="container"></div>
     <div class="bottom-container">
+        <div class="button-container">
+            <div>
+                <button id="upBtn" class="button">上</button>
+            </div>
+            <div>
+                <button id="leftBtn" class="button">左</button>
+                <button id="downBtn" class="button">下</button>
+                <button id="rightBtn" class="button">右</button>
+            </div>
+        </div>
+    </div>
+    <div class="step">
+        <span id="stepDom">步数: 0</span>
         <button id="resetBtn" class="button">重新开始</button>
-        <div id="stepDom" class="step">步数：</div>
-        <button id="upBtn" class="button">上</button>
-        <button id="downBtn" class="button">下</button>
-        <button id="leftBtn" class="button">左</button>
-        <button id="rightBtn" class="button">右</button>
     </div>
     <h2> <a href="index.html">更多游戏</a></h2>
     <script type="text/javascript">
