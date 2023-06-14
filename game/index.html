@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>游戏列表</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .game-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .game-list li {
+            margin-bottom: 10px;
+        }
+
+        .game-list li a {
+            display: block;
+            padding: 10px;
+            background-color: #eee;
+            color: #333;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .game-list li a:hover {
+            background-color: #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>游戏列表</h1>
+    <ul class="game-list">
+        <li><a href="maze.html">迷宫</a></li>
+        <li><a href="flipGame.html">点灯</a></li>
+        <li><a href="sokoban.html">推箱子</a></li>
+    </ul>
+</body>
+
+</html>
