@@ -135,6 +135,26 @@
             align-items: center;
             /* 新增 */
         }
+
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 5px solid #ccc;
+            border-top-color: #333;
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
@@ -154,7 +174,8 @@
     </div>
     <div class="step">
         <span id="stepDom">步数: 0</span>
-        <button id="resetBtn" class="button">重新开始</button>
+        <button id="startBtn" class="button">新的开始</button>
+        <button id="resetBtn" class="button">重置本局</button>
     </div>
     <h2> <a href="index.html">更多游戏</a></h2>
     <script type="text/javascript">
@@ -194,51 +215,124 @@
             // 对每个箱子进行判断
             for (let i = 0; i < boxPos.length; i++) {
                 let visited = new Set();
-                let queue = [playerPos];
-                let isReachable = false;
+                let queue = [boxPos[i]];
+                visited.add(boxPos[i].toString());
 
-                // 搜索路径
                 while (queue.length > 0) {
-                    let curr = queue.shift();
-                    if (visited.has(curr.toString())) {
-                        continue;
-                    }
-                    visited.add(curr.toString());
-
-                    if (curr[0] === boxPos[i][0] && curr[1] === boxPos[i][1]) {
-                        isReachable = true;
-                        break;
-                    }
-
-                    // 向四个方向扩展
-                    let dx = [0, 0, -1, 1];
-                    let dy = [-1, 1, 0, 0];
-                    for (let j = 0; j < 4; j++) {
-                        let nextX = curr[0] + dx[j];
-                        let nextY = curr[1] + dy[j];
-                        if (map[nextX][nextY] !== wallMap) {
-                            queue.push([nextX, nextY]);
+                    let [x, y] = queue.shift();
+                    for (let [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
+                        let nx = x + dx, ny = y + dy;
+                        if (nx < 0 || nx >= map.length || ny < 0 || ny >= map[0].length) {
+                            continue;
                         }
+                        if (map[nx][ny] === wallMap) {
+                            continue;
+                        }
+                        if (visited.has([nx, ny].toString())) {
+                            continue;
+                        }
+                        visited.add([nx, ny].toString());
+                        if (map[nx][ny] === targetMap) {
+                            break;
+                        }
+                        queue.push([nx, ny]);
                     }
                 }
 
-                // 如果当前箱子不可达，则地图不可解
-                if (!isReachable) {
+                // 判断是否所有箱子都能到达对应的 target
+                let canReachAllTargets = true;
+                for (let j = 0; j < boxPos.length; j++) {
+                    if (i === j) {
+                        continue;
+                    }
+                    if (!visited.has(boxPos[j].toString())) {
+                        canReachAllTargets = false;
+                        break;
+                    }
+                }
+                if (!canReachAllTargets) {
                     return false;
                 }
             }
 
-            // 所有箱子都可达，则地图可解
             return true;
         }
 
+        // 找到所有可以放置箱子的位置
+        function findBoxPositions() {
+            const positions = [];
+            const mapLen = map.length;
+            for (let i = 1; i < mapLen - 1; i++) {
+                for (let j = 1; j < mapLen - 1; j++) {
+                    if (map[i][j] === 0 &&
+                        map[i - 1][j] !== wallMap &&
+                        map[i + 1][j] !== wallMap &&
+                        map[i][j - 1] !== wallMap &&
+                        map[i][j + 1] !== wallMap) {
+                        positions.push({ x: i, y: j });
+                    }
+                }
+            }
+            return positions;
+        }
+
+        // 随机放置箱子
+        function placeBoxes(boxLen) {
+            const positions = findBoxPositions();
+            for (let i = 0; i < boxLen; i++) {
+                const idx = Math.floor(Math.random() * positions.length);
+                const { x, y } = positions[idx];
+                map[x][y] = boxMap;
+                positions.splice(idx, 1);
+            }
+        }
+
+        function findTargetPositions() {
+            const positions = [];
+            const mapLen = map.length;
+            for (let i = 1; i < mapLen - 1; i++) {
+                for (let j = 1; j < mapLen - 1; j++) {
+                    if (map[i][j] === 0) {
+                        positions.push({ x: i, y: j });
+                    }
+                }
+            }
+            return positions;
+        }
+
+        // 随机放置目标
+        function placeTargets(boxLen) {
+            const positions = findTargetPositions();
+            for (let i = 0; i < boxLen; i++) {
+                const idx = Math.floor(Math.random() * positions.length);
+                const { x, y } = positions[idx];
+                map[x][y] = targetMap;
+                positions.splice(idx, 1);
+            }
+        }
+
+        function findPlayerPositions() {
+            const positions = [];
+            const mapLen = map.length;
+            for (let i = 1; i < mapLen - 2; i++) {
+                for (let j = 1; j < mapLen - 2; j++) {
+                    if (map[i][j] === 0) {
+                        positions.push({ x: i, y: j });
+                    }
+                }
+            }
+            return positions;
+        }
+
         function generateMap() {
+            console.log("生成地图开始");
+            const startTime = Date.now();
+            const mapLen = 8;
+            //地图 箱子数目
+            const boxLen = 6;
             var isSolvable = false;
             while (!isSolvable) {
                 map = [];
-                const mapLen = 8;
-                //地图 箱子数目
-                const boxLen = 6;
                 let w = 0;
                 for (let x = 0; x < mapLen; x++) {
                     map.push([]);
@@ -256,36 +350,21 @@
                     }
                 }
                 // 随机放置箱子
-                for (let i = 0; i < boxLen; i++) {
-                    let x, y;
-                    do {
-                        x = Math.floor(Math.random() * (mapLen - 2)) + 1;
-                        y = Math.floor(Math.random() * (mapLen - 2)) + 1;
-                    } while (map[x][y] !== 0 ||
-                    map[x - 1][y] === wallMap ||
-                    map[x + 1][y] === wallMap ||
-                    map[x][y - 1] === wallMap ||
-                        map[x][y + 1] === wallMap);
-                    map[x][y] = boxMap;
-                }
+                placeBoxes(boxLen);
                 // 随机放置目标位置
-                for (let i = 0; i < boxLen; i++) {
-                    let x, y;
-                    do {
-                        x = Math.floor(Math.random() * (mapLen - 1)) + 1;
-                        y = Math.floor(Math.random() * (mapLen - 1)) + 1;
-                    } while (map[x][y] !== 0);
-                    map[x][y] = targetMap;
-                }
-
+                placeTargets(boxLen);
+                
                 // 随机放置人物
-                let x, y;
-                do {
-                    x = Math.floor(Math.random() * (mapLen - 2)) + 1;
-                    y = Math.floor(Math.random() * (mapLen - 2)) + 1;
-                } while (map[x][y] !== 0);
+                const positions = findPlayerPositions()
+                const idx = Math.floor(Math.random() * positions.length);
+                const { x, y } = positions[idx];
                 map[x][y] = playerMap;
-
+                const endTime = Date.now();
+                let generateTime = endTime - startTime;
+                if (generateTime > 2e3) {
+                    console.log("生成地图用时：" + (generateTime) + "ms");
+                    return;
+                }
                 // 判断地图是否可解
                 isSolvable = isMapSolvable(map);
             }
@@ -305,6 +384,7 @@
         var stepsDom = document.getElementById("stepDom");
 
         function init() {
+            stepsDom.innerHTML = "步数: " + steps;
             for (var i = 0; i < map.length; i++) {
                 for (var j = 0; j < map[i].length; j++) {
                     let x = j;
@@ -459,6 +539,31 @@
             }
         }
 
+        function clearUI() {
+            walls.forEach(function (wall) {
+                wall.dom.remove();
+            });
+            walls = [];
+            clears.forEach(function (clear) {
+                clear.dom.remove();
+            });
+            clears = [];
+            boxs.forEach(function (box) {
+                box.dom.remove();
+            });
+            boxs = [];
+            targets.forEach(function (target) {
+                target.dom.remove();
+            });
+            targets = [];
+
+            player.dom.remove();
+            player = {};
+            solve = 0;
+            isGameOver = false;
+            steps = 0;
+        }
+
         function addKeyListener() {
             document.onkeydown = function (event) {
                 if (isGameOver) {
@@ -476,9 +581,24 @@
                 }
             }
 
+
+            var startBtn = document.getElementById("startBtn");
+            startBtn.addEventListener("click", function () {
+                // 添加 loading 元素
+                const loading = document.createElement("div");
+                loading.className = "loading";
+                document.body.appendChild(loading);
+                clearUI();
+                generateMap();
+                init();
+                // 移除 loading 元素
+                document.body.removeChild(loading);
+            });
+
             var resetBtn = document.getElementById("resetBtn");
             resetBtn.addEventListener("click", function () {
-                location.reload();
+                clearUI();
+                init();
             });
 
             document.getElementById("upBtn").addEventListener("click", function () {
