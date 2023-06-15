@@ -51,15 +51,25 @@
         .target {
             width: 100px;
             height: 100px;
-            background-image: url('img/sokoban_target.png');
-            background-size: cover;
-            /* 使图片填充整个元素 */
             position: absolute;
             top: 0;
             left: 0;
             border-radius: 5px;
+            border-radius: 5px;
             box-shadow: 0 0 5px #666;
             z-index: 1;
+        }
+
+        .target::before {
+            content: "";
+            display: block;
+            position: relative;
+            width: 30px;
+            height: 30px;
+            left: 35px;
+            top: 35px;
+            border-radius: 50%;
+            background-color: tomato;
         }
 
         .wall {
