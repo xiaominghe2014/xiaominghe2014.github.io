@@ -23,7 +23,9 @@
         .box {
             width: 100px;
             height: 100px;
-            background-color: #cf3b0aa6;
+            background-image: url('img/sokoban_box.png');
+            background-size: cover;
+            /* 使图片填充整个元素 */
             position: absolute;
             top: 0;
             left: 0;
@@ -35,11 +37,13 @@
         .player {
             width: 100px;
             height: 100px;
-            background-color: #e216a2;
+            background: url('img/sokoban_player.png') no-repeat center;
+            background-size: 50px;
+            /* 使图片填充整个元素 */
             position: absolute;
             top: 0;
             left: 0;
-            border-radius: 50%;
+            /* border-radius: 50%; */
             box-shadow: 0 0 5px #dbb2b2;
             z-index: 2;
         }
@@ -47,7 +51,9 @@
         .target {
             width: 100px;
             height: 100px;
-            background-color: rgb(81, 0, 255);
+            background-image: url('img/sokoban_target.png');
+            background-size: cover;
+            /* 使图片填充整个元素 */
             position: absolute;
             top: 0;
             left: 0;
@@ -59,7 +65,9 @@
         .wall {
             width: 100px;
             height: 100px;
-            background-color: #999;
+            background-image: url('img/sokoban_wall.png');
+            background-size: cover;
+            /* 使图片填充整个元素 */
             position: absolute;
             top: 0;
             left: 0;
@@ -83,12 +91,26 @@
         .clear {
             width: 100px;
             height: 100px;
+            background-image: url('img/sokoban_box.png');
+            background-size: cover;
+            /* 使图片填充整个元素 */
             position: absolute;
             top: 0;
             left: 0;
             border-radius: 5px;
-            background-color: #0f0;
             z-index: 4;
+        }
+
+        .clear::before {
+            content: "";
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 0, 0, 0.5);
+            /* 设置红色半透明遮罩颜色 */
+            position: absolute;
+            top: 0;
+            left: 0;
         }
 
         .bottom-container {
@@ -353,7 +375,7 @@
                 placeBoxes(boxLen);
                 // 随机放置目标位置
                 placeTargets(boxLen);
-                
+
                 // 随机放置人物
                 const positions = findPlayerPositions()
                 const idx = Math.floor(Math.random() * positions.length);
