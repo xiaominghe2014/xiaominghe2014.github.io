@@ -13,16 +13,15 @@
 
         #container {
             margin: 0 auto;
-            width: 800px;
-            height: 800px;
-            background-color: #fff;
-            box-shadow: 0 0 10px #999;
+            width: fit-content;
+            height: fit-content;
+            background-color: #f5f5f5;
             position: relative;
         }
 
         .box {
-            width: 100px;
-            height: 100px;
+            width: 50px;
+            height: 50px;
             background-image: url('img/sokoban_box.png');
             background-size: cover;
             /* 使图片填充整个元素 */
@@ -35,8 +34,8 @@
         }
 
         .player {
-            width: 100px;
-            height: 100px;
+            width: 50px;
+            height: 50px;
             background: url('img/sokoban_player.png') no-repeat center;
             background-size: 50px;
             /* 使图片填充整个元素 */
@@ -45,36 +44,36 @@
             left: 0;
             /* border-radius: 50%; */
             box-shadow: 0 0 5px #dbb2b2;
-            z-index: 2;
+            z-index: 1;
         }
 
         .target {
-            width: 100px;
-            height: 100px;
+            width: 50px;
+            height: 50px;
             position: absolute;
             top: 0;
             left: 0;
             border-radius: 5px;
             border-radius: 5px;
             box-shadow: 0 0 5px #666;
-            z-index: 1;
+            z-index: 2;
         }
 
         .target::before {
             content: "";
             display: block;
             position: relative;
-            width: 30px;
-            height: 30px;
-            left: 35px;
-            top: 35px;
+            width: 20px;
+            height: 20px;
+            left: 15px;
+            top: 15px;
             border-radius: 50%;
-            background-color: tomato;
+            background-color: rgb(205, 121, 106);
         }
 
         .wall {
-            width: 100px;
-            height: 100px;
+            width: 50px;
+            height: 50px;
             background-image: url('img/sokoban_wall.png');
             background-size: cover;
             /* 使图片填充整个元素 */
@@ -87,8 +86,8 @@
         }
 
         .floor {
-            width: 100px;
-            height: 100px;
+            width: 50px;
+            height: 50px;
             background-color: #ccc;
             position: absolute;
             top: 0;
@@ -99,8 +98,8 @@
         }
 
         .clear {
-            width: 100px;
-            height: 100px;
+            width: 50px;
+            height: 50px;
             background-image: url('img/sokoban_box.png');
             background-size: cover;
             /* 使图片填充整个元素 */
@@ -205,201 +204,52 @@
         </div>
     </div>
     <div class="step">
-        <span id="stepDom">步数: 0</span>
+        <span id="stepDom">level 1 步数: 0</span>
         <button id="startBtn" class="button">新的开始</button>
         <button id="resetBtn" class="button">重置本局</button>
     </div>
     <h2> <a href="index.html">更多游戏</a></h2>
     <script type="text/javascript">
-
+        const nothing = -1;
+        const floorMap = 0;
         const playerMap = 1;
-        const wallMap = 2;
-        const boxMap = 3;
-        const targetMap = 4;
-        const cellW = 100;
+        const wallMap = 1 << 1;
+        const boxMap = 1 << 2;
+        const targetMap = 1 << 3;
+        const cellW = 50;
+        var level = 0;
         var map = [
-            // [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-            // [2, 1, 0, 0, 0, 0, 0, 0, 0, 2],
-            // [2, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-            // [2, 0, 0, 0, 4, 0, 4, 0, 0, 2],
-            // [2, 0, 3, 0, 0, 3, 0, 0, 0, 2],
-            // [2, 0, 0, 0, 3, 0, 0, 0, 0, 2],
-            // [2, 0, 0, 4, 0, 0, 0, 0, 0, 2],
-            // [2, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-            // [2, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-            // [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
         ];
 
-
-        function isMapSolvable(map) {
-            // 找到人物和箱子的位置
-            let playerPos, boxPos = [];
-            for (let i = 0; i < map.length; i++) {
-                for (let j = 0; j < map[i].length; j++) {
-                    if (map[i][j] === playerMap) {
-                        playerPos = [i, j];
-                    } else if (map[i][j] === boxMap) {
-                        boxPos.push([i, j]);
-                    }
-                }
-            }
-
-            // 对每个箱子进行判断
-            for (let i = 0; i < boxPos.length; i++) {
-                let visited = new Set();
-                let queue = [boxPos[i]];
-                visited.add(boxPos[i].toString());
-
-                while (queue.length > 0) {
-                    let [x, y] = queue.shift();
-                    for (let [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
-                        let nx = x + dx, ny = y + dy;
-                        if (nx < 0 || nx >= map.length || ny < 0 || ny >= map[0].length) {
-                            continue;
-                        }
-                        if (map[nx][ny] === wallMap) {
-                            continue;
-                        }
-                        if (visited.has([nx, ny].toString())) {
-                            continue;
-                        }
-                        visited.add([nx, ny].toString());
-                        if (map[nx][ny] === targetMap) {
-                            break;
-                        }
-                        queue.push([nx, ny]);
-                    }
-                }
-
-                // 判断是否所有箱子都能到达对应的 target
-                let canReachAllTargets = true;
-                for (let j = 0; j < boxPos.length; j++) {
-                    if (i === j) {
-                        continue;
-                    }
-                    if (!visited.has(boxPos[j].toString())) {
-                        canReachAllTargets = false;
-                        break;
-                    }
-                }
-                if (!canReachAllTargets) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        // 找到所有可以放置箱子的位置
-        function findBoxPositions() {
-            const positions = [];
-            const mapLen = map.length;
-            for (let i = 1; i < mapLen - 1; i++) {
-                for (let j = 1; j < mapLen - 1; j++) {
-                    if (map[i][j] === 0 &&
-                        map[i - 1][j] !== wallMap &&
-                        map[i + 1][j] !== wallMap &&
-                        map[i][j - 1] !== wallMap &&
-                        map[i][j + 1] !== wallMap) {
-                        positions.push({ x: i, y: j });
-                    }
-                }
-            }
-            return positions;
-        }
-
-        // 随机放置箱子
-        function placeBoxes(boxLen) {
-            const positions = findBoxPositions();
-            for (let i = 0; i < boxLen; i++) {
-                const idx = Math.floor(Math.random() * positions.length);
-                const { x, y } = positions[idx];
-                map[x][y] = boxMap;
-                positions.splice(idx, 1);
-            }
-        }
-
-        function findTargetPositions() {
-            const positions = [];
-            const mapLen = map.length;
-            for (let i = 1; i < mapLen - 1; i++) {
-                for (let j = 1; j < mapLen - 1; j++) {
-                    if (map[i][j] === 0) {
-                        positions.push({ x: i, y: j });
-                    }
-                }
-            }
-            return positions;
-        }
-
-        // 随机放置目标
-        function placeTargets(boxLen) {
-            const positions = findTargetPositions();
-            for (let i = 0; i < boxLen; i++) {
-                const idx = Math.floor(Math.random() * positions.length);
-                const { x, y } = positions[idx];
-                map[x][y] = targetMap;
-                positions.splice(idx, 1);
-            }
-        }
-
-        function findPlayerPositions() {
-            const positions = [];
-            const mapLen = map.length;
-            for (let i = 1; i < mapLen - 2; i++) {
-                for (let j = 1; j < mapLen - 2; j++) {
-                    if (map[i][j] === 0) {
-                        positions.push({ x: i, y: j });
-                    }
-                }
-            }
-            return positions;
-        }
+        const mapArr = [
+            //level 1
+            // [[-1, -1, 2, 2, 2, 2, 2, -1],
+            // [2, 2, 2, 0, 0, 0, 2, -1],
+            // [2, 8, 1, 4, 0, 0, 2, -1],
+            // [2, 2, 2, 0, 4, 8, 2, -1],
+            // [2, 8, 2, 2, 4, 0, 2, -1],
+            // [2, 0, 2, 0, 8, 0, 2, 2],
+            // [2, 4, 0, 8 | 4, 4, 4, 8, 2],
+            // [2, 0, 0, 0, 8, 0, 0, 2],
+            // [2, 2, 2, 2, 2, 2, 2, 2],],
+            //level 2
+            [
+             [-1,-1,-1,-1,2,2,2,2,2,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+             [-1,-1,-1,-1,2,0,0,0,2,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+             [-1,-1,-1,-1,2,4,0,0,2,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+             [-1,-1,2,2,2,0,0,4,2,2,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+             [-1,-1,2,0,0,4,0,4,0,2,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+             [2,2,2,0,2,0,2,2,0,2,-1,-1,-1,2,2,2,2,2,2],
+             [2,0,0,0,2,0,2,2,0,2,2,2,2,2,0,0,8,8,2],
+             [2,0,4,0,0,4,0,0,0,0,0,0,0,0,0,0,8,8,2],
+             [2,2,2,2,2,0,2,2,2,0,2,1,2,2,0,0,8,8,2],
+             [-1,-1,-1,-1,2,0,0,0,0,0,2,2,2,2,2,2,2,2,2],
+             [-1,-1,-1,-1,2,2,2,2,2,2,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+            ],
+        ];
 
         function generateMap() {
-            console.log("生成地图开始");
-            const startTime = Date.now();
-            const mapLen = 8;
-            //地图 箱子数目
-            const boxLen = 6;
-            var isSolvable = false;
-            while (!isSolvable) {
-                map = [];
-                let w = 0;
-                for (let x = 0; x < mapLen; x++) {
-                    map.push([]);
-                    for (let y = 0; y < mapLen; y++) {
-                        if (x == 0 || y == 0 || x == mapLen - 1 || y == mapLen - 1) {
-                            map[x].push(wallMap);
-                        } else {
-                            if (w < 3 && Math.random() < 0.2) {
-                                map[x].push(wallMap);
-                                w++;
-                            } else {
-                                map[x].push(0);
-                            }
-                        }
-                    }
-                }
-                // 随机放置箱子
-                placeBoxes(boxLen);
-                // 随机放置目标位置
-                placeTargets(boxLen);
-
-                // 随机放置人物
-                const positions = findPlayerPositions()
-                const idx = Math.floor(Math.random() * positions.length);
-                const { x, y } = positions[idx];
-                map[x][y] = playerMap;
-                const endTime = Date.now();
-                let generateTime = endTime - startTime;
-                if (generateTime > 2e3) {
-                    console.log("生成地图用时：" + (generateTime) + "ms");
-                    return;
-                }
-                // 判断地图是否可解
-                isSolvable = isMapSolvable(map);
-            }
+            map = mapArr[level];
         }
 
         generateMap();
@@ -408,6 +258,7 @@
         var boxs = [];
         var targets = [];
         var walls = [];
+        var floors = [];
         var clears = [];
         var solve = 0;
         var player = {};
@@ -416,16 +267,19 @@
         var stepsDom = document.getElementById("stepDom");
 
         function init() {
-            stepsDom.innerHTML = "步数: " + steps;
+            stepsDom.innerHTML = `level ${level+1} 步数: ${steps}`;
             for (var i = 0; i < map.length; i++) {
                 for (var j = 0; j < map[i].length; j++) {
                     let x = j;
                     let y = i;
-                    var floor = document.createElement("div");
-                    floor.className = "floor";
-                    floor.style.left = x * cellW + "px";
-                    floor.style.top = y * cellW + "px";
-                    container.appendChild(floor);
+                    if(map[i][j] != nothing){
+                        var floor = document.createElement("div");
+                        floor.className = "floor";
+                        floor.style.left = x * cellW + "px";
+                        floor.style.top = y * cellW + "px";
+                        container.appendChild(floor);
+                        floors.push(floor);
+                    }
                     if (map[i][j] == playerMap) {
                         playerDom = document.createElement("div");
                         playerDom.className = "player";
@@ -455,8 +309,30 @@
                         container.appendChild(box);
                         boxs.push({ x: x, y: y, dom: box });
                     }
+                    else if (map[i][j] == (boxMap | targetMap)) {
+                        var target = document.createElement("div");
+                        target.className = "target";
+                        target.style.top = y * cellW + "px";
+                        target.style.left = x * cellW + "px";
+                        container.appendChild(target);
+                        targets.push({ x: x, y: y, dom: target });
+                        var box = document.createElement("div");
+                        box.className = "box";
+                        box.style.top = y * cellW + "px";
+                        box.style.left = x * cellW + "px";
+                        container.appendChild(box);
+                        boxs.push({ x: x, y: y, dom: box });
+                        var clear = document.createElement("div");
+                        clear.className = "clear";
+                        clear.style.top = y * cellW + "px";
+                        clear.style.left = x * cellW + "px";
+                        container.appendChild(clear);
+                        clears.push({ x: x, y: y, dom: clear });
+                    }
                 }
             }
+            container.style.width = `${map[0].length * cellW}px`;
+            container.style.height = `${map.length * cellW}px`;
         }
 
         function boxIdx(x, y) {
@@ -562,7 +438,7 @@
             player.dom.style.top = y * cellW + "px";
             player.dom.style.left = x * cellW + "px";
             steps++;
-            stepsDom.innerHTML = "步数: " + steps;
+            stepsDom.innerHTML = `level ${level+1} 步数: ${steps}`;
             if (solve == targets.length) {
                 isGameOver = true;
                 setTimeout(function () {
@@ -572,6 +448,10 @@
         }
 
         function clearUI() {
+            floors.forEach(function (floor) {
+                floor.remove();
+            });
+            floors = []
             walls.forEach(function (wall) {
                 wall.dom.remove();
             });
@@ -588,8 +468,7 @@
                 target.dom.remove();
             });
             targets = [];
-
-            player.dom.remove();
+            player.dom && player.dom.remove();
             player = {};
             solve = 0;
             isGameOver = false;
@@ -621,6 +500,7 @@
                 loading.className = "loading";
                 document.body.appendChild(loading);
                 clearUI();
+                level = (level+1)%mapArr.length;
                 generateMap();
                 init();
                 // 移除 loading 元素
