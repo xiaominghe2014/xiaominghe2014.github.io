@@ -38,6 +38,7 @@
             height: 50px;
             background: url('img/sokoban_player.png') no-repeat center;
             background-size: 50px;
+            /* animation: gif 5s infinite; */
             /* 使图片填充整个元素 */
             position: absolute;
             top: 0;
@@ -45,6 +46,28 @@
             /* border-radius: 50%; */
             box-shadow: 0 0 5px #dbb2b2;
             z-index: 1;
+        }
+
+        @keyframes gif {
+            0% {
+                background: url('img/sokoban_player_1.png') no-repeat center;
+            }
+
+            25% {
+                background: url('img/sokoban_player_2.png') no-repeat center;
+            }
+
+            50% {
+                background: url('img/sokoban_player_1.png') no-repeat center;
+            }
+
+            75% {
+                background: url('img/sokoban_player_2.png') no-repeat center;
+            }
+
+            100% {
+                background: url('img/sokoban_player_1.png') no-repeat center;
+            }
         }
 
         .target {
@@ -223,29 +246,50 @@
 
         const mapArr = [
             //level 1
-            // [[-1, -1, 2, 2, 2, 2, 2, -1],
-            // [2, 2, 2, 0, 0, 0, 2, -1],
-            // [2, 8, 1, 4, 0, 0, 2, -1],
-            // [2, 2, 2, 0, 4, 8, 2, -1],
-            // [2, 8, 2, 2, 4, 0, 2, -1],
-            // [2, 0, 2, 0, 8, 0, 2, 2],
-            // [2, 4, 0, 8 | 4, 4, 4, 8, 2],
-            // [2, 0, 0, 0, 8, 0, 0, 2],
-            // [2, 2, 2, 2, 2, 2, 2, 2],],
-            //level 2
             [
-             [-1,-1,-1,-1,2,2,2,2,2,-1,-1,-1,-1,-1,-1,-1,-1,-1],
-             [-1,-1,-1,-1,2,0,0,0,2,-1,-1,-1,-1,-1,-1,-1,-1,-1],
-             [-1,-1,-1,-1,2,4,0,0,2,-1,-1,-1,-1,-1,-1,-1,-1,-1],
-             [-1,-1,2,2,2,0,0,4,2,2,-1,-1,-1,-1,-1,-1,-1,-1,-1],
-             [-1,-1,2,0,0,4,0,4,0,2,-1,-1,-1,-1,-1,-1,-1,-1,-1],
-             [2,2,2,0,2,0,2,2,0,2,-1,-1,-1,2,2,2,2,2,2],
-             [2,0,0,0,2,0,2,2,0,2,2,2,2,2,0,0,8,8,2],
-             [2,0,4,0,0,4,0,0,0,0,0,0,0,0,0,0,8,8,2],
-             [2,2,2,2,2,0,2,2,2,0,2,1,2,2,0,0,8,8,2],
-             [-1,-1,-1,-1,2,0,0,0,0,0,2,2,2,2,2,2,2,2,2],
-             [-1,-1,-1,-1,2,2,2,2,2,2,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+                [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+                [2, 1, 0, 0, 0, 2, 0, 0, 0, 0, 2],
+                [2, 0, 4, 0, 8, 4, 8, 0, 4, 0, 2],
+                [2, 0, 0, 8, 0, 8, 0, 8, 0, 0, 2],
+                [2, 2, 2, 2, 8, 2, 8, 2, 2, 2, 2],
+                [2, 0, 0, 4, 0, 8, 0, 4, 0, 0, 2],
+                [2, 0, 4, 0, 0, 4, 0, 0, 4, 0, 2],
+                [2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2],
+                [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
             ],
+            //level 2
+            [[-1, -1, 2, 2, 2, 2, 2, -1],
+            [2, 2, 2, 0, 0, 0, 2, -1],
+            [2, 8, 1, 4, 0, 0, 2, -1],
+            [2, 2, 2, 0, 4, 8, 2, -1],
+            [2, 8, 2, 2, 4, 0, 2, -1],
+            [2, 0, 2, 0, 8, 0, 2, 2],
+            [2, 4, 0, 8 | 4, 4, 4, 8, 2],
+            [2, 0, 0, 0, 8, 0, 0, 2],
+            [2, 2, 2, 2, 2, 2, 2, 2],],
+            //level 3
+            [
+                [-1, -1, -1, -1, 2, 2, 2, 2, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                [-1, -1, -1, -1, 2, 0, 0, 0, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                [-1, -1, -1, -1, 2, 4, 0, 0, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                [-1, -1, 2, 2, 2, 0, 0, 4, 2, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                [-1, -1, 2, 0, 0, 4, 0, 4, 0, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                [2, 2, 2, 0, 2, 0, 2, 2, 0, 2, -1, -1, -1, 2, 2, 2, 2, 2, 2],
+                [2, 0, 0, 0, 2, 0, 2, 2, 0, 2, 2, 2, 2, 2, 0, 0, 8, 8, 2],
+                [2, 0, 4, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 2],
+                [2, 2, 2, 2, 2, 0, 2, 2, 2, 0, 2, 1, 2, 2, 0, 0, 8, 8, 2],
+                [-1, -1, -1, -1, 2, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+                [-1, -1, -1, -1, 2, 2, 2, 2, 2, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+            ],
+            [[-1, -1, 2, 2, 2, 2],
+            [-1, 2, 2, 1, 8, 2],
+            [-1, 2, 8, 4, 4, 2],
+            [2, 2, 0, 4, 0, 2],
+            [2, 0, 8, 2, 0, 2],
+            [2, 0, 0, 0, 0, 2],
+            [2, 0, 0, 2, 2, 2],
+            [2, 2, 2, 2, -1, -1],],
+
         ];
 
         function generateMap() {
@@ -267,12 +311,12 @@
         var stepsDom = document.getElementById("stepDom");
 
         function init() {
-            stepsDom.innerHTML = `level ${level+1} 步数: ${steps}`;
+            stepsDom.innerHTML = `level ${level + 1} 步数: ${steps}`;
             for (var i = 0; i < map.length; i++) {
                 for (var j = 0; j < map[i].length; j++) {
                     let x = j;
                     let y = i;
-                    if(map[i][j] != nothing){
+                    if (map[i][j] != nothing) {
                         var floor = document.createElement("div");
                         floor.className = "floor";
                         floor.style.left = x * cellW + "px";
@@ -438,7 +482,7 @@
             player.dom.style.top = y * cellW + "px";
             player.dom.style.left = x * cellW + "px";
             steps++;
-            stepsDom.innerHTML = `level ${level+1} 步数: ${steps}`;
+            stepsDom.innerHTML = `level ${level + 1} 步数: ${steps}`;
             if (solve == targets.length) {
                 isGameOver = true;
                 setTimeout(function () {
@@ -500,7 +544,7 @@
                 loading.className = "loading";
                 document.body.appendChild(loading);
                 clearUI();
-                level = (level+1)%mapArr.length;
+                level = (level + 1) % mapArr.length;
                 generateMap();
                 init();
                 // 移除 loading 元素
