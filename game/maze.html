@@ -3,7 +3,8 @@
 
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+        <meta name="viewport"
+            content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
         <title>迷宫生成器</title>
         <style>
             body {
@@ -45,6 +46,12 @@
                 margin-top: 20px;
             }
 
+            .center-div {
+                margin: 0 auto;
+                /* 水平居中 */
+                width: 50%;
+                /* 设置宽度为父元素宽度的一半 */
+            }
         </style>
 
     </head>
@@ -58,7 +65,9 @@
             <button class="button" onclick="clearAll()">清除</button>
             <button class="button" onclick="startSearch()">寻路</button>
         </div>
-        <h2> <a href="index.html">更多游戏</a></h2>
+        <div class="center-div">
+            <h3><a href="index.html">更多小游戏</a></h3>
+        </div>
     </body>
     <script>
         try { window.console && window.console.log && (console.log("欢\n迎\n查\n看\n迷宫生成器!")) } catch (e) { }

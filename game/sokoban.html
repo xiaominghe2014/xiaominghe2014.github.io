@@ -211,6 +211,13 @@
                 transform: rotate(360deg);
             }
         }
+
+        .center-div {
+            margin: 0 auto;
+            /* 水平居中 */
+            width: 50%;
+            /* 设置宽度为父元素宽度的一半 */
+        }
     </style>
 </head>
 
@@ -231,10 +238,13 @@
     <div class="step">
         <span id="stepDom">level 1 步数: 0</span>
         <button id="startBtn" class="button">关卡选择</button>
-        <button id="resetBtn" class="button">重置本局</button>
+        <button id="resetBtn" class="button">重玩本关</button>
     </div>
-    <h2> <a href="index.html">更多游戏</a></h2>
+    <div class="center-div">
+        <h3><a href="index.html">更多小游戏</a></h3>
+    </div>
     <script src="js/picker.min.js"></script>
+    <!-- <script src="js/gif.js"></script> -->
     <script type="text/javascript">
         const _ = -1;
         const f = 0;
@@ -298,6 +308,25 @@
                 [w, o, x, 0, 0, w],
                 [w, o, o, o | x, o, w],
                 [w, w, w, w, w, w],
+            ],
+            [
+                [_, _, w, w, w, w, _, _],
+                [_, _, w, o, o, w, _, _],
+                [_, w, w, 0, o, w, w, _],
+                [_, w, 0, 0, x, o, w, _],
+                [w, w, 0, x, 0, 0, w, w],
+                [w, 0, 0, w, x, x, 0, w],
+                [w, 0, 0, p, 0, 0, 0, w],
+                [w, w, w, w, w, w, w, w],
+            ],
+            [
+                [_, w, w, w, w, w, w, w],
+                [w, w, 0, 0, 0, 0, w, _],
+                [w, 0, x, 0, x, x, 0, w],
+                [w, o, o, o, o, o, o, w],
+                [w, 0, x, x, 0, x, 0, w],
+                [w, w, w, 0, p, w, w, w],
+                [_, _, w, w, w, w, _, _],
             ],
             [
                 [w, w, w, w, w, w, w, w, w, w, w],
@@ -368,6 +397,10 @@
         var isGameOver = false;
         var steps = 0;
         var stepsDom = document.getElementById("stepDom");
+        // var gif = new GIF({
+        //     workers: 2,
+        //     quality: 10
+        // });
 
         function init() {
             stepsDom.innerHTML = `第${level + 1}关   步数: ${steps}`;
@@ -545,13 +578,13 @@
             if (solve == targets.length && !isGameOver) {
                 isGameOver = true;
                 setTimeout(function () {
-                    alert("恭喜你，通关了！");
-                    let next = confirm("挑战下一关");
+                    alert(`恭喜你，通过第${level + 1}关！`);
+                    let next = confirm("继续挑战");
                     if (next) {
                         level = (level + 1) % mapArr.length;
                         start();
                     }
-                }, 1);
+                }, 100);
             }
         }
 
