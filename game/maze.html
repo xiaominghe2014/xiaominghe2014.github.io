@@ -219,6 +219,8 @@
          * 生成迷宫
          */
         function startPrim() {
+            cellAll = []
+            wallAll = []
             cellAll = new Array(wN * hN).fill(0).map((_, i) => [i])
             for (let x = 0; x < wN; x++) {
                 for (let y = 0; y < hN; y++) {
@@ -237,7 +239,10 @@
             let idx = 0;
             function animate() {
                 if (isNotEnd()) {
-                    idx = connectedCellRandom();
+                    let t = wN*hN;
+                    for(let i=0 ; i<t/100;i++){
+                        idx = connectedCellRandom();
+                    }
                     requestAnimationFrame(animate);
                 } else {
                     console.log("------------------", cellAll[idx].length);
