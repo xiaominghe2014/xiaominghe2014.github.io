@@ -270,13 +270,13 @@
                 [_, w, w, w, w, w, _, _, _],
             ],
             [
-                [_,w,w,w,w,w,w,w,_,_],
-                [_,w,0,0,0,0,0,w,w,w],
-                [w,w,x,w,w,w,0,0,0,w],
-                [w,0,p,0,x,0,0,x,0,w],
-                [w,0,o,o,w,0,x,0,w,w],
-                [w,w,o,o,w,0,0,0,w,_],
-                [_,w,w,w,w,w,w,w,w,_],
+                [_, w, w, w, w, w, w, w, _, _],
+                [_, w, 0, 0, 0, 0, 0, w, w, w],
+                [w, w, x, w, w, w, 0, 0, 0, w],
+                [w, 0, p, 0, x, 0, 0, x, 0, w],
+                [w, 0, o, o, w, 0, x, 0, w, w],
+                [w, w, o, o, w, 0, 0, 0, w, _],
+                [_, w, w, w, w, w, w, w, w, _],
             ],
             [
                 [_, _, w, w, w, w],
@@ -288,6 +288,16 @@
                 [w, 0, 0, w, w, w],
                 [w, 0, 0, w, w, w],
                 [w, w, w, w, _, _],
+            ],
+            [
+                [_, w, w, w, w, _],
+                [w, w, 0, 0, w, _],
+                [w, p, x, 0, w, _],
+                [w, w, x, 0, w, w],
+                [w, w, 0, x, 0, w],
+                [w, o, x, 0, 0, w],
+                [w, o, o, o | x, o, w],
+                [w, w, w, w, w, w],
             ],
             [
                 [w, w, w, w, w, w, w, w, w, w, w],
@@ -402,7 +412,7 @@
                         container.appendChild(box);
                         boxs.push({ x: xx, y: yy, dom: box });
                     }
-                    else if (map[i][j] == (xx | o)) {
+                    else if (map[i][j] == (x | o)) {
                         var target = document.createElement("div");
                         target.className = "target";
                         target.style.top = yy * cellW + "px";
@@ -532,7 +542,7 @@
             player.dom.style.left = xx * cellW + "px";
             steps++;
             stepsDom.innerHTML = `第${level + 1}关   步数: ${steps}`;
-            if (solve == targets.length) {
+            if (solve == targets.length && !isGameOver) {
                 isGameOver = true;
                 setTimeout(function () {
                     alert("恭喜你，通关了！");
@@ -585,9 +595,9 @@
 
         function addKeyListener() {
             document.onkeydown = function (event) {
-                if (isGameOver) {
-                    return;
-                }
+                // if (isGameOver) {
+                //     return;
+                // }
                 var e = event || window.event || arguments.callee.caller.arguments[0];
                 if (e && e.keyCode == 37) {
                     movePlayer("left");
