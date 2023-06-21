@@ -14,9 +14,13 @@
             }
 
             #canvas-container {
-                margin-top: 20px;
+                /* margin-top: 20px;
                 margin-left: 20px;
-                margin-right: 20px;
+                margin-right: 20px; */
+                margin: 0 auto;
+                width: fit-content;
+                height: fit-content;
+                position: relative;
             }
 
             #canvas {
@@ -58,58 +62,90 @@
 
     <body>
         <div id="canvas-container">
-            <canvas id="canvas" width="300" height="300"></canvas>
+            <canvas id="canvas" width="fit-content" height="fit-content"></canvas>
         </div>
         <div class="button-container">
             <button class="button" onclick="generateMazy()">点击生成迷宫</button>
             <button class="button" onclick="clearAll()">清除</button>
             <button class="button" onclick="startSearch()">寻路</button>
+            <button class="button" onclick="defineWH()">自定义迷宫宽高</button>
         </div>
         <div class="center-div">
             <h3><a href="index.html">更多小游戏</a></h3>
         </div>
     </body>
+    <script src="js/picker.min.js"></script>
     <script>
         try { window.console && window.console.log && (console.log("欢\n迎\n查\n看\n迷宫生成器!")) } catch (e) { }
 
-
-        var canvas = document.getElementById("canvas")
-        var ctx = canvas.getContext("2d")
-        var matrixN = 10
-        var w = canvas.clientWidth
-        var h = canvas.clientHeight
-        var cellW = w / matrixN, cellH = h / matrixN
-
+        var wN = 20;
+        var hN = 15;
+        var cellW = 30, cellH = 30;
+        var w = wN * cellW;
+        var h = hN * cellH;
         let characterX = cellW / 2
         let characterY = cellH / 2
+        var canvas = document.getElementById("canvas")
+        var canvasContainer = document.getElementById("canvas-container")
+        var ctx = canvas.getContext("2d")
 
-        function generateMazy(matrixN = 20) {
-            clearAll()
-            generateMatrix(matrixN)
+        function defineWH() {
+            let dataW = [];
+            let dataH = [];
+            for (let i = 5; i < 100; i++) {
+                dataW.push({ text: `宽${i}`, value: i });
+                dataH.push({ text: `高${i}`, value: i });
+            }
+            var picker = new Picker({
+                data: [dataW, dataH],
+                selected: [0,0],
+                title: "自定义迷宫宽高"
+            });
+            picker.on('picker.select', function (selectedVal, selectedIndex) {
+                console.log(selectedIndex);
+                wN = dataW[selectedIndex[0]].value;
+                hN = dataH[selectedIndex[1]].value;
+                generateMazy();
+            });
+            picker.show();
         }
 
-        function generateMatrix(n) {
-            matrixN = n
-            cellW = w / n
-            cellH = h / n
+        function initCanvas() {
+            canvasContainer.style.width = `${wN * cellW}px`
+            canvasContainer.style.height = `${hN * cellH}px`
+            canvas.width = `${wN * cellW}`
+            canvas.height = `${hN * cellH}`
+            w = wN * cellW;
+            h = hN * cellH;
+            // characterX = cellW / 2
+            // characterY = cellH / 2
+        }
+
+        function generateMazy() {
+            clearAll()
+            initCanvas()
+            generateMatrix()
+        }
+
+        function generateMatrix() {
             initData()
             initUI()
             startPrim()
         }
 
         function initUI() {
-            for (let i = 0; i <= matrixN; i++) {
+            //画网格
+            for (let i = 0; i <= wN; i++) {
+                //竖
                 drawLine({ x: cellW * i, y: 0 }, { x: cellW * i, y: h })
-                drawLine({ x: 0, y: cellH * i }, { x: w, y: cellH * i })
+            }
+            for (let j = 0; j <= hN; j++) {
+                //横
+                drawLine({ x: 0, y: j * cellH }, { x: w, y: j * cellH })
             }
 
-            // for(let j = 0 ; j < n*n ; j ++){
-            //     let x = j%n*cellW
-            //     let y = Math.floor(j/n)*cellH + cellH/2
-            //     drawText(j,x,y)
-            // }
             connectedCell(0, 0)
-            connectedCell(matrixN * matrixN - 1, 1)
+            connectedCell(wN * hN - 1, 1)
             drawCharacter(cellW >> 1, cellH >> 1)
         }
 
@@ -117,7 +153,7 @@
 
         function initData() {
             map = []
-            for (let j = 0; j < matrixN * matrixN; j++) {
+            for (let j = 0; j < wN * hN; j++) {
                 map.push({
                     idx: j,
                     neighbor: [null, null, null, null],
@@ -154,8 +190,8 @@
          * @param {*} direct 0上1下2左3右
          */
         function connectedCell(index, direct) {
-            let x = (index % matrixN) * cellW
-            let y = Math.floor(index / matrixN) * cellH
+            let x = (index % wN) * cellW
+            let y = Math.floor(index / wN) * cellH
             let cw = cellW - 2
             let ch = cellH - 2
             switch (direct) {
@@ -183,11 +219,11 @@
          * 生成迷宫
          */
         function startPrim() {
-            cellAll = new Array(matrixN * matrixN).fill(0).map((_, i) => [i])
-            for (let x = 0; x < matrixN; x++) {
-                for (let y = 0; y < matrixN; y++) {
+            cellAll = new Array(wN * hN).fill(0).map((_, i) => [i])
+            for (let x = 0; x < wN; x++) {
+                for (let y = 0; y < hN; y++) {
                     //第 x,y 坐标的格子
-                    let idx = y * matrixN + x
+                    let idx = y * wN + x
                     let btm = getDirectIndex(idx, 1)
                     let right = getDirectIndex(idx, 3)
                     if (btm != -1) {
@@ -217,33 +253,34 @@
         }
 
         function getDirectIndex(index, direct) {
-            let min = 0
-            let maxXY = matrixN - 1
-            let x = index % matrixN
-            let y = Math.floor(index / matrixN)
+            let min = 0;
+            let maxX = wN - 1;
+            let maxY = hN - 1;
+            let x = index % wN
+            let y = Math.floor(index / wN)
             switch (direct) {
                 case 0:
                     //上
-                    if (y - 1 >= min && y - 1 <= maxXY) {
-                        return (y - 1) * matrixN + x
+                    if (y - 1 >= min && y - 1 <= maxY) {
+                        return (y - 1) * wN + x
                     }
                     return -1;
                 case 1:
                     //下
-                    if (y + 1 >= min && y + 1 <= maxXY) {
-                        return (y + 1) * matrixN + x
+                    if (y + 1 >= min && y + 1 <= maxY) {
+                        return (y + 1) * wN + x
                     }
                     return -1;
                 case 2:
                     //左
-                    if (x - 1 >= min && x - 1 <= maxXY) {
-                        return y * matrixN + x - 1
+                    if (x - 1 >= min && x - 1 <= maxX) {
+                        return y * wN + x - 1
                     }
                     return -1;
                 case 3:
                     //右
-                    if (x + 1 >= min && x + 1 <= maxXY) {
-                        return y * matrixN + x + 1
+                    if (x + 1 >= min && x + 1 <= maxX) {
+                        return y * wN + x + 1
                     }
                     return -1
                 default:
@@ -280,7 +317,7 @@
         function isNotEnd() {
             for (let i = 0; i < cellAll.length; i++) {
                 let cell = cellAll[i]
-                if (cell.indexOf(0) != -1 && cell.indexOf(matrixN * matrixN - 1) != -1) {
+                if (cell.indexOf(0) != -1 && cell.indexOf(wN * hN - 1) != -1) {
                     return false
                 }
             }
@@ -288,8 +325,8 @@
         }
 
         function idxToXY(idx) {
-            let x = idx % matrixN
-            let y = Math.floor(idx / matrixN)
+            let x = idx % wN;
+            let y = Math.floor(idx / wN)
             return { x: x, y: y }
         }
 
@@ -302,7 +339,7 @@
 
         function drawTag(idx) {
             let j = idx
-            let n = matrixN
+            let n = wN
             let x = j % n * cellW + cellW / 2
             let y = Math.floor(j / n) * cellH + cellH / 2
             ctx.beginPath()
@@ -319,7 +356,7 @@
             let openList = []
             let closeList = []
             let startNode = map[0]
-            let endNode = map[matrixN * matrixN - 1]
+            let endNode = map[wN * hN - 1]
             startNode.G = 0
             startNode.H = getDis(startNode.idx, endNode.idx)
             let addOpen = (node) => {
@@ -361,7 +398,7 @@
                 minNode.inOpen = false
                 addOpen(minNode)
                 let j = minNode.idx
-                let n = matrixN
+                let n = wN
                 let x = j % n * cellW
                 let y = Math.floor(j / n) * cellH + cellH / 2
                 // drawText(p++,x,y)
@@ -390,12 +427,12 @@
                     from = arr[i]
                     let to = arr[i - 1]
                     let start = {
-                        x: from % matrixN * cellW + cellW / 2,
-                        y: Math.floor(from / matrixN) * cellH + cellH / 2
+                        x: from % wN * cellW + cellW / 2,
+                        y: Math.floor(from / wN) * cellH + cellH / 2
                     }
                     let end = {
-                        x: to % matrixN * cellW + cellW / 2,
-                        y: Math.floor(to / matrixN) * cellH + cellH / 2
+                        x: to % wN * cellW + cellW / 2,
+                        y: Math.floor(to / wN) * cellH + cellH / 2
                     }
 
                     moveCharacter(start, end)
