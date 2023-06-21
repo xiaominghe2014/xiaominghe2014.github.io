@@ -351,6 +351,16 @@
                 [w, w, w, w, w, w, w, w],
             ],
             [
+                [_, w, w, w, w, w, w, _],
+                [_, w, 0, 0, o, p, w, w],
+                [_, w, 0, 0, 0, x, o, w],
+                [_, w, w, w, o | x, w, 0, w],
+                [w, w, 0, 0, 0, 0, 0, w],
+                [w, 0, 0, x, 0, 0, w, w],
+                [w, 0, 0, 0, w, w, w, _],
+                [w, w, w, w, w, _, _, _],
+            ],
+            [
                 [_, _, _, _, w, w, w, w, w, _, _, _, _, _, _, _, _, _],
                 [_, _, _, _, w, 0, 0, 0, w, _, _, _, _, _, _, _, _, _],
                 [_, _, _, _, w, x, 0, 0, w, _, _, _, _, _, _, _, _, _],
@@ -464,6 +474,7 @@
                         clear.style.left = xx * cellW + "px";
                         container.appendChild(clear);
                         clears.push({ x: xx, y: yy, dom: clear });
+                        solve++;
                     }
                 }
             }
@@ -623,6 +634,7 @@
             clearUI();
             generateMap();
             init();
+            isGameOver = false;
             document.body.removeChild(loading);
         }
 
