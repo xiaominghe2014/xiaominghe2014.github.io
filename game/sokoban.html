@@ -4,6 +4,8 @@
 <head>
     <title>推箱子</title>
     <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
     <style type="text/css">
         body {
             margin: 0;
@@ -228,83 +230,113 @@
     </div>
     <div class="step">
         <span id="stepDom">level 1 步数: 0</span>
-        <button id="startBtn" class="button">新的开始</button>
+        <button id="startBtn" class="button">关卡选择</button>
         <button id="resetBtn" class="button">重置本局</button>
     </div>
     <h2> <a href="index.html">更多游戏</a></h2>
+    <script src="js/picker.min.js"></script>
     <script type="text/javascript">
-        const nothing = -1;
-        const floorMap = 0;
-        const playerMap = 1;
-        const wallMap = 1 << 1;
-        const boxMap = 1 << 2;
-        const targetMap = 1 << 3;
+        const _ = -1;
+        const f = 0;
+        const p = 1;
+        const w = 1 << 1;
+        const x = 1 << 2;
+        const o = 1 << 3;
         const cellW = 50;
         var level = 0;
         var map = [
         ];
 
         const mapArr = [
-            //level 1
             [
-                [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-                [2, 1, 0, 0, 0, 2, 0, 0, 0, 0, 2],
-                [2, 0, 4, 0, 8, 4, 8, 0, 4, 0, 2],
-                [2, 0, 0, 8, 0, 8, 0, 8, 0, 0, 2],
-                [2, 2, 2, 2, 8, 2, 8, 2, 2, 2, 2],
-                [2, 0, 0, 4, 0, 8, 0, 4, 0, 0, 2],
-                [2, 0, 4, 0, 0, 4, 0, 0, 4, 0, 2],
-                [2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2],
-                [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-            ],
-            //level 2
-            [
-                [-1, -1, 2, 2, 2, 2, 2, -1],
-                [2, 2, 2, 0, 0, 0, 2, -1],
-                [2, 8, 1, 4, 0, 0, 2, -1],
-                [2, 2, 2, 0, 4, 8, 2, -1],
-                [2, 8, 2, 2, 4, 0, 2, -1],
-                [2, 0, 2, 0, 8, 0, 2, 2],
-                [2, 4, 0, 8 | 4, 4, 4, 8, 2],
-                [2, 0, 0, 0, 8, 0, 0, 2],
-                [2, 2, 2, 2, 2, 2, 2, 2],],
-            //level 3
-            [
-                [-1, -1, -1, -1, 2, 2, 2, 2, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                [-1, -1, -1, -1, 2, 0, 0, 0, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                [-1, -1, -1, -1, 2, 4, 0, 0, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                [-1, -1, 2, 2, 2, 0, 0, 4, 2, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                [-1, -1, 2, 0, 0, 4, 0, 4, 0, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                [2, 2, 2, 0, 2, 0, 2, 2, 0, 2, -1, -1, -1, 2, 2, 2, 2, 2, 2],
-                [2, 0, 0, 0, 2, 0, 2, 2, 0, 2, 2, 2, 2, 2, 0, 0, 8, 8, 2],
-                [2, 0, 4, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 2],
-                [2, 2, 2, 2, 2, 0, 2, 2, 2, 0, 2, 1, 2, 2, 0, 0, 8, 8, 2],
-                [-1, -1, -1, -1, 2, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-                [-1, -1, -1, -1, 2, 2, 2, 2, 2, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                [_, _, w, w, w, _, _, _],
+                [_, _, w, o, w, _, _, _],
+                [_, _, w, 0, w, w, w, w],
+                [w, w, w, x, 0, x, o, w],
+                [w, o, 0, x, p, w, w, w],
+                [w, w, w, w, x, w, _, _],
+                [_, _, _, w, o, w, _, _],
+                [_, _, _, w, w, w, _, _],
             ],
             [
-                [-1, -1, 2, 2, 2, 2],
-                [-1, 2, 2, 1, 8, 2],
-                [-1, 2, 8, 4, 4, 2],
-                [2, 2, 0, 4, 0, 2],
-                [2, 0, 8, 2, 0, 2],
-                [2, 0, 0, 0, 0, 2],
-                [2, 0, 0, 2, 2, 2],
-                [2, 0, 0, 2, 2, 2],
-                [2, 2, 2, 2, -1, -1],],
+                [w, w, w, w, w, _, _, _, _],
+                [w, p, 0, 0, w, _, _, _, _],
+                [w, 0, x, x, w, _, w, w, w],
+                [w, 0, x, 0, w, _, w, o, w],
+                [w, w, w, 0, w, w, w, o, w],
+                [_, w, w, 0, 0, 0, 0, o, w],
+                [_, w, 0, 0, 0, w, 0, 0, w],
+                [_, w, 0, 0, 0, w, w, w, w],
+                [_, w, w, w, w, w, _, _, _],
+            ],
             [
-                [-1, -1, -1, -1, -1, 2, 2, 2, 2, 2, 2, 2, -1],
-                [-1, -1, -1, -1, -1, 2, 0, 0, 2, 0, 0, 2, -1],
-                [-1, -1, -1, -1, -1, 2, 0, 0, 4, 4, 0, 2, -1],
-                [2, 2, 2, 2, 2, 2, 0, 4, 2, 0, 0, 2, -1],
-                [2, 8, 8, 8, 2, 2, 2, 0, 2, 0, 0, 2, 2],
-                [2, 8, 0, 0, 2, 0, 0, 4, 0, 2, 0, 0, 2],
-                [2, 8, 0, 0, 0, 0, 4, 0, 4, 0, 4, 0, 2],
-                [2, 8, 0, 0, 2, 0, 0, 4, 0, 2, 0, 0, 2],
-                [2, 8, 8, 8, 2, 2, 2, 0, 2, 0, 0, 2, 2],
-                [2, 2, 2, 2, 2, 2, 0, 4, 0, 0, 0, 2, -1],
-                [-1, -1, -1, -1, -1, 2, 0, 1, 2, 0, 0, 2, -1],
-                [-1, -1, -1, -1, -1, 2, 2, 2, 2, 2, 2, 2, -1]
+                [_,w,w,w,w,w,w,w,_,_],
+                [_,w,0,0,0,0,0,w,w,w],
+                [w,w,x,w,w,w,0,0,0,w],
+                [w,0,p,0,x,0,0,x,0,w],
+                [w,0,o,o,w,0,x,0,w,w],
+                [w,w,o,o,w,0,0,0,w,_],
+                [_,w,w,w,w,w,w,w,w,_],
+            ],
+            [
+                [_, _, w, w, w, w],
+                [_, w, w, p, o, w],
+                [_, w, o, x, x, w],
+                [w, w, 0, x, 0, w],
+                [w, 0, o, w, 0, w],
+                [w, 0, 0, 0, 0, w],
+                [w, 0, 0, w, w, w],
+                [w, 0, 0, w, w, w],
+                [w, w, w, w, _, _],
+            ],
+            [
+                [w, w, w, w, w, w, w, w, w, w, w],
+                [w, p, 0, 0, 0, w, 0, 0, 0, 0, w],
+                [w, 0, x, 0, o, x, o, 0, x, 0, w],
+                [w, 0, 0, o, 0, o, 0, o, 0, 0, w],
+                [w, w, w, w, o, w, o, w, w, w, w],
+                [w, 0, 0, x, 0, o, 0, x, 0, 0, w],
+                [w, 0, x, 0, 0, x, 0, 0, x, 0, w],
+                [w, 0, 0, 0, 0, w, 0, 0, 0, 0, w],
+                [w, w, w, w, w, w, w, w, w, w, w],
+            ],
+            [
+                [_, _, w, w, w, w, w, _],
+                [w, w, w, 0, 0, 0, w, _],
+                [w, o, p, x, 0, 0, w, _],
+                [w, w, w, 0, x, o, w, _],
+                [w, o, w, w, x, 0, w, _],
+                [w, 0, w, 0, o, 0, w, w],
+                [w, x, 0, o | x, x, x, o, w],
+                [w, 0, 0, 0, o, 0, 0, w],
+                [w, w, w, w, w, w, w, w],
+            ],
+            [
+                [_, _, _, _, w, w, w, w, w, _, _, _, _, _, _, _, _, _],
+                [_, _, _, _, w, 0, 0, 0, w, _, _, _, _, _, _, _, _, _],
+                [_, _, _, _, w, x, 0, 0, w, _, _, _, _, _, _, _, _, _],
+                [_, _, w, w, w, 0, 0, x, w, w, _, _, _, _, _, _, _, _, _],
+                [_, _, w, 0, 0, x, 0, x, 0, w, _, _, _, _, _, _, _, _, _],
+                [w, w, w, 0, w, 0, w, w, 0, w, _, _, _, w, w, w, w, w, w],
+                [w, 0, 0, 0, w, 0, w, w, 0, w, w, w, w, w, 0, 0, o, o, w],
+                [w, 0, x, 0, 0, x, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, o, o, w],
+                [w, w, w, w, w, 0, w, w, w, 0, w, p, w, w, 0, 0, o, o, w],
+                [_, _, _, _, w, 0, 0, 0, 0, 0, w, w, w, w, w, w, w, w, w],
+                [_, _, _, _, w, w, w, w, w, w, _, _, _, _, _, _, _, _, _],
+            ],
+            [
+                [_, _, _, _, _, w, w, w, w, w, w, w, _],
+                [_, _, _, _, _, w, 0, 0, w, 0, 0, w, _],
+                [_, _, _, _, _, w, 0, 0, x, x, 0, w, _],
+                [w, w, w, w, w, w, 0, x, w, 0, 0, w, _],
+                [w, o, o, o, w, w, w, 0, w, 0, 0, w, w],
+                [w, o, 0, 0, w, 0, 0, x, 0, w, 0, 0, w],
+                [w, o, 0, 0, 0, 0, x, 0, x, 0, x, 0, w],
+                [w, o, 0, 0, w, 0, 0, x, 0, w, 0, 0, w],
+                [w, o, o, o, w, w, w, 0, w, 0, 0, w, w],
+                [w, w, w, w, w, w, 0, x, 0, 0, 0, w, _],
+                [_, _, _, _, _, w, 0, p, w, 0, 0, w, _],
+                [_, _, _, _, _, w, w, w, w, w, w, w, _]
             ],
 
         ];
@@ -328,67 +360,67 @@
         var stepsDom = document.getElementById("stepDom");
 
         function init() {
-            stepsDom.innerHTML = `level ${level + 1} 步数: ${steps}`;
+            stepsDom.innerHTML = `第${level + 1}关   步数: ${steps}`;
             for (var i = 0; i < map.length; i++) {
                 for (var j = 0; j < map[i].length; j++) {
-                    let x = j;
-                    let y = i;
-                    if (map[i][j] != nothing) {
+                    let xx = j;
+                    let yy = i;
+                    if (map[i][j] != _) {
                         var floor = document.createElement("div");
                         floor.className = "floor";
-                        floor.style.left = x * cellW + "px";
-                        floor.style.top = y * cellW + "px";
+                        floor.style.left = xx * cellW + "px";
+                        floor.style.top = yy * cellW + "px";
                         container.appendChild(floor);
                         floors.push(floor);
                     }
-                    if (map[i][j] == playerMap) {
+                    if (map[i][j] == p) {
                         playerDom = document.createElement("div");
                         playerDom.className = "player";
-                        playerDom.style.left = x * cellW + "px";
-                        playerDom.style.top = y * cellW + "px";
+                        playerDom.style.left = xx * cellW + "px";
+                        playerDom.style.top = yy * cellW + "px";
                         container.appendChild(playerDom);
-                        player = { x: x, y: y, dom: playerDom };
-                    } else if (map[i][j] == wallMap) {
+                        player = { x: xx, y: yy, dom: playerDom };
+                    } else if (map[i][j] == w) {
                         var wall = document.createElement("div");
                         wall.className = "wall";
-                        wall.style.top = y * cellW + "px";
-                        wall.style.left = x * cellW + "px";
+                        wall.style.top = yy * cellW + "px";
+                        wall.style.left = xx * cellW + "px";
                         container.appendChild(wall);
-                        walls.push({ x: x, y: y, dom: wall });
-                    } else if (map[i][j] == targetMap) {
+                        walls.push({ x: xx, y: yy, dom: wall });
+                    } else if (map[i][j] == o) {
                         var target = document.createElement("div");
                         target.className = "target";
-                        target.style.top = y * cellW + "px";
-                        target.style.left = x * cellW + "px";
+                        target.style.top = yy * cellW + "px";
+                        target.style.left = xx * cellW + "px";
                         container.appendChild(target);
-                        targets.push({ x: x, y: y, dom: target });
-                    } else if (map[i][j] == boxMap) {
+                        targets.push({ x: xx, y: yy, dom: target });
+                    } else if (map[i][j] == x) {
                         var box = document.createElement("div");
                         box.className = "box";
-                        box.style.top = y * cellW + "px";
-                        box.style.left = x * cellW + "px";
+                        box.style.top = yy * cellW + "px";
+                        box.style.left = xx * cellW + "px";
                         container.appendChild(box);
-                        boxs.push({ x: x, y: y, dom: box });
+                        boxs.push({ x: xx, y: yy, dom: box });
                     }
-                    else if (map[i][j] == (boxMap | targetMap)) {
+                    else if (map[i][j] == (xx | o)) {
                         var target = document.createElement("div");
                         target.className = "target";
-                        target.style.top = y * cellW + "px";
-                        target.style.left = x * cellW + "px";
+                        target.style.top = yy * cellW + "px";
+                        target.style.left = xx * cellW + "px";
                         container.appendChild(target);
-                        targets.push({ x: x, y: y, dom: target });
+                        targets.push({ x: xx, y: yy, dom: target });
                         var box = document.createElement("div");
                         box.className = "box";
-                        box.style.top = y * cellW + "px";
-                        box.style.left = x * cellW + "px";
+                        box.style.top = yy * cellW + "px";
+                        box.style.left = xx * cellW + "px";
                         container.appendChild(box);
-                        boxs.push({ x: x, y: y, dom: box });
+                        boxs.push({ x: xx, y: yy, dom: box });
                         var clear = document.createElement("div");
                         clear.className = "clear";
-                        clear.style.top = y * cellW + "px";
-                        clear.style.left = x * cellW + "px";
+                        clear.style.top = yy * cellW + "px";
+                        clear.style.left = xx * cellW + "px";
                         container.appendChild(clear);
-                        clears.push({ x: x, y: y, dom: clear });
+                        clears.push({ x: xx, y: yy, dom: clear });
                     }
                 }
             }
@@ -396,36 +428,36 @@
             container.style.height = `${map.length * cellW}px`;
         }
 
-        function boxIdx(x, y) {
+        function boxIdx(xx, yy) {
             for (var i = 0; i < boxs.length; i++) {
-                if (boxs[i].x == x && boxs[i].y == y) {
+                if (boxs[i].x == xx && boxs[i].y == yy) {
                     return i;
                 }
             }
             return -1;
         }
 
-        function wallIdx(x, y) {
+        function wallIdx(xx, yy) {
             for (var i = 0; i < walls.length; i++) {
-                if (walls[i].x == x && walls[i].y == y) {
+                if (walls[i].x == xx && walls[i].y == yy) {
                     return i;
                 }
             }
             return -1;
         }
 
-        function targetIdx(x, y) {
+        function targetIdx(xx, yy) {
             for (var i = 0; i < targets.length; i++) {
-                if (targets[i].x == x && targets[i].y == y) {
+                if (targets[i].x == xx && targets[i].y == yy) {
                     return i;
                 }
             }
             return -1;
         }
 
-        function clearIdx(x, y) {
+        function clearIdx(xx, yy) {
             for (var i = 0; i < clears.length; i++) {
-                if (clears[i].x == x && clears[i].y == y) {
+                if (clears[i].x == xx && clears[i].y == yy) {
                     return i;
                 }
             }
@@ -433,22 +465,22 @@
         }
 
         function moveBox(i, direction) {
-            var x = boxs[i].x;
-            var y = boxs[i].y;
-            var clearI = clearIdx(x, y);
+            var xx = boxs[i].x;
+            var yy = boxs[i].y;
+            var clearI = clearIdx(xx, yy);
             if (direction == "left") {
-                x--;
+                xx--;
             } else if (direction == "right") {
-                x++;
+                xx++;
             } else if (direction == "up") {
-                y--;
+                yy--;
             } else if (direction == "down") {
-                y++;
+                yy++;
             }
-            if (wallIdx(x, y) != -1) {
+            if (wallIdx(xx, yy) != -1) {
                 return false;
             }
-            if (boxIdx(x, y) != -1) {
+            if (boxIdx(xx, yy) != -1) {
                 return false;
             }
             if (clearI != -1) {
@@ -457,54 +489,59 @@
                 clears[clearI].dom.remove();
                 clears.splice(clearI, 1);
             }
-            if (targetIdx(x, y) != -1) {
+            if (targetIdx(xx, yy) != -1) {
                 solve++;
                 var clear = document.createElement("div");
                 clear.className = "clear";
-                clear.style.top = y * cellW + "px";
-                clear.style.left = x * cellW + "px";
+                clear.style.top = yy * cellW + "px";
+                clear.style.left = xx * cellW + "px";
                 container.appendChild(clear);
-                clears.push({ x: x, y: y, dom: clear });
+                clears.push({ x: xx, y: yy, dom: clear });
             }
-            boxs[i].x = x;
-            boxs[i].y = y;
-            boxs[i].dom.style.top = y * cellW + "px";
-            boxs[i].dom.style.left = x * cellW + "px";
+            boxs[i].x = xx;
+            boxs[i].y = yy;
+            boxs[i].dom.style.top = yy * cellW + "px";
+            boxs[i].dom.style.left = xx * cellW + "px";
             return true;
         }
 
         function movePlayer(direction) {
-            var x = player.x;
-            var y = player.y;
+            var xx = player.x;
+            var yy = player.y;
             if (direction == "left") {
-                x--;
+                xx--;
             } else if (direction == "right") {
-                x++;
+                xx++;
             } else if (direction == "up") {
-                y--;
+                yy--;
             } else if (direction == "down") {
-                y++;
+                yy++;
             }
-            if (wallIdx(x, y) != -1) {
+            if (wallIdx(xx, yy) != -1) {
                 return;
             }
-            var i = boxIdx(x, y);
+            var i = boxIdx(xx, yy);
             if (i != -1) {
                 if (!moveBox(i, direction)) {
                     return;
                 }
             }
-            player.x = x;
-            player.y = y;
-            player.dom.style.top = y * cellW + "px";
-            player.dom.style.left = x * cellW + "px";
+            player.x = xx;
+            player.y = yy;
+            player.dom.style.top = yy * cellW + "px";
+            player.dom.style.left = xx * cellW + "px";
             steps++;
-            stepsDom.innerHTML = `level ${level + 1} 步数: ${steps}`;
+            stepsDom.innerHTML = `第${level + 1}关   步数: ${steps}`;
             if (solve == targets.length) {
                 isGameOver = true;
                 setTimeout(function () {
                     alert("恭喜你，通关了！");
-                }, 0);
+                    let next = confirm("挑战下一关");
+                    if (next) {
+                        level = (level + 1) % mapArr.length;
+                        start();
+                    }
+                }, 1);
             }
         }
 
@@ -536,6 +573,16 @@
             steps = 0;
         }
 
+        function start() {
+            const loading = document.createElement("div");
+            loading.className = "loading";
+            document.body.appendChild(loading);
+            clearUI();
+            generateMap();
+            init();
+            document.body.removeChild(loading);
+        }
+
         function addKeyListener() {
             document.onkeydown = function (event) {
                 if (isGameOver) {
@@ -556,18 +603,21 @@
 
             var startBtn = document.getElementById("startBtn");
             startBtn.addEventListener("click", function () {
-                // 添加 loading 元素
-                const loading = document.createElement("div");
-                loading.className = "loading";
-                document.body.appendChild(loading);
-                clearUI();
-                level = (level + 1) % mapArr.length;
-                generateMap();
-                init();
-                // 移除 loading 元素
-                document.body.removeChild(loading);
+                let data = [];
+                for (let i = 0; i < mapArr.length; i++) {
+                    data.push({ text: `第${i + 1}关`, value: i });
+                }
+                var picker = new Picker({
+                    data: [data],
+                    selected: [0],
+                    title: "关卡选择"
+                });
+                picker.on('picker.select', function (selectedVal, selectedIndex) {
+                    level = selectedIndex[0];
+                    start();
+                });
+                picker.show();
             });
-
             var resetBtn = document.getElementById("resetBtn");
             resetBtn.addEventListener("click", function () {
                 clearUI();
