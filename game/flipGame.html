@@ -23,8 +23,8 @@
         }
 
         td {
-            width: 100px;
-            height: 100px;
+            width: 50px;
+            height: 50px;
             border: 1px solid black;
             text-align: center;
             vertical-align: middle;
@@ -110,6 +110,8 @@
                 }
                 table.appendChild(row);
             }
+            table.style.width = `${numRows * 50}px`;
+            table.style.height = `${numRows * 50}px`;
         }
 
         const boardClick = function (event) {
