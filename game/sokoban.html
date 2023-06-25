@@ -21,6 +21,81 @@
             position: relative;
         }
 
+        .heart {
+
+            width: 10px;
+
+            height: 10px;
+
+            background-color: tomato;
+
+            position: relative;
+
+            /* transform: rotate(45deg); */
+
+            animation: heartBlink 1.5s ease-out infinite;
+        }
+
+        .heart:before,
+
+        .heart:after {
+
+            content: "";
+
+            width: 10px;
+
+            height: 10px;
+
+            background-color: tomato;
+
+            border-radius: 50%;
+
+            position: absolute;
+
+        }
+
+        .heart:before {
+            top: -5px;
+            left: 0;
+        }
+
+
+
+        .heart:after {
+
+            top: 0;
+
+            left: -5px;
+
+        }
+
+        @keyframes heartBlink {
+            0% {
+                /* box-shadow: -1px 0 5px #dbb2b2; */
+                transform: scale(1) rotate(45deg);
+            }
+
+            25% {
+                /* box-shadow: -1px 0 6px #dbb2b2; */
+                transform: scale(1.1) rotate(45deg);
+            }
+
+            50% {
+                /* box-shadow: -1px 0 6px #dbb2b2; */
+                transform: scale(1.2) rotate(45deg);
+            }
+
+            75% {
+                /* box-shadow: -1px 0 6px #dbb2b2; */
+                transform: scale(1.1) rotate(45deg);
+            }
+
+            100% {
+                /* box-shadow: -1px 0 5px #dbb2b2; */
+                transform: scale(1) rotate(45deg);
+            }
+        }
+
         .box {
             width: 50px;
             height: 50px;
@@ -31,15 +106,17 @@
             top: 0;
             left: 0;
             border-radius: 5px;
-            box-shadow: 0 0 5px #666;
+            /* box-shadow: 0 0 5px #666; */
             z-index: 2;
         }
 
         .player {
             width: 50px;
             height: 50px;
-            background: url('img/sokoban_player.png') no-repeat center;
-            background-size: 50px;
+            background-image: url('img/baby_down.png');
+            background-size: 40px;
+            background-repeat: no-repeat;
+            background-position: center;
             /* animation: gif 5s infinite; */
             /* 使图片填充整个元素 */
             position: absolute;
@@ -84,7 +161,7 @@
             z-index: 2;
         }
 
-        .target::before {
+        /* .target::before {
             content: "";
             display: block;
             position: relative;
@@ -94,7 +171,7 @@
             top: 15px;
             border-radius: 50%;
             background-color: rgb(205, 121, 106);
-        }
+        } */
 
         .wall {
             width: 50px;
@@ -105,20 +182,24 @@
             position: absolute;
             top: 0;
             left: 0;
-            border-radius: 5px;
-            box-shadow: 0 0 5px #666;
+            /* border-radius: 5px; */
+            /* box-shadow: 0 0 5px #666; */
             z-index: 3;
         }
 
         .floor {
             width: 50px;
             height: 50px;
-            background-color: #ccc;
+            background-image: url('img/floor_tile_2.png');
+            background-size: 49px;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-color: #666;
             position: absolute;
             top: 0;
             left: 0;
-            border-radius: 5px;
-            box-shadow: 0 0 5px #666;
+            /* border-radius: 5px; */
+            /* box-shadow: 0 0 5px #666; */
             z-index: 0;
         }
 
@@ -244,188 +325,17 @@
         <h3><a href="index.html">更多小游戏</a></h3>
     </div>
     <script src="js/picker.min.js"></script>
+    <script src="js/sokoban.js"></script>
     <!-- <script src="js/gif.js"></script> -->
     <script type="text/javascript">
-        const _ = -1;
-        const f = 0;
-        const p = 1;
-        const w = 1 << 1;
-        const x = 1 << 2;
-        const o = 1 << 3;
         const cellW = 50;
         var level = 0;
         var map = [
         ];
-
-        const mapArr = [
-            [
-                [_, _, w, w, w, _, _, _],
-                [_, _, w, o, w, _, _, _],
-                [_, _, w, 0, w, w, w, w],
-                [w, w, w, x, 0, x, o, w],
-                [w, o, 0, x, p, w, w, w],
-                [w, w, w, w, x, w, _, _],
-                [_, _, _, w, o, w, _, _],
-                [_, _, _, w, w, w, _, _],
-            ],
-            [
-                [w, w, w, w, _, _, _],
-                [w, 0, 0, w, w, w, w],
-                [w, 0, o, 0, o, 0, w],
-                [w, 0, x, x, w, p, w],
-                [w, w, 0, 0, 0, 0, w],
-                [_, w, w, w, w, w, _],
-            ],
-            [
-                [w, w, w, w, w, w],
-                [w, 0, w, 0, o, w],
-                [w, 0, x, 0, o, w],
-                [w, p, 0, x, o, w],
-                [w, 0, x, x, o, w],
-                [w, 0, 0, w, w, w],
-                [w, w, w, w, _, _],
-            ],
-            [
-                [w, w, w, w, w, _, _, _, _],
-                [w, p, 0, 0, w, _, _, _, _],
-                [w, 0, x, x, w, _, w, w, w],
-                [w, 0, x, 0, w, _, w, o, w],
-                [w, w, w, 0, w, w, w, o, w],
-                [_, w, w, 0, 0, 0, 0, o, w],
-                [_, w, 0, 0, 0, w, 0, 0, w],
-                [_, w, 0, 0, 0, w, w, w, w],
-                [_, w, w, w, w, w, _, _, _],
-            ],
-            [
-                [_, w, w, w, w, w, w, w, _, _],
-                [_, w, 0, 0, 0, 0, 0, w, w, w],
-                [w, w, x, w, w, w, 0, 0, 0, w],
-                [w, 0, p, 0, x, 0, 0, x, 0, w],
-                [w, 0, o, o, w, 0, x, 0, w, w],
-                [w, w, o, o, w, 0, 0, 0, w, _],
-                [_, w, w, w, w, w, w, w, w, _],
-            ],
-            [
-                [_, _, w, w, w, w],
-                [_, w, w, p, o, w],
-                [_, w, o, x, x, w],
-                [w, w, 0, x, 0, w],
-                [w, 0, o, w, 0, w],
-                [w, 0, 0, 0, 0, w],
-                [w, 0, 0, w, w, w],
-                [w, 0, 0, w, w, w],
-                [w, w, w, w, _, _],
-            ],
-            [
-                [_, w, w, w, w, _],
-                [w, w, 0, 0, w, _],
-                [w, p, x, 0, w, _],
-                [w, w, x, 0, w, w],
-                [w, w, 0, x, 0, w],
-                [w, o, x, 0, 0, w],
-                [w, o, o, o | x, o, w],
-                [w, w, w, w, w, w],
-            ],
-            [
-                [_, _, w, w, w, w, _, _],
-                [_, _, w, o, o, w, _, _],
-                [_, w, w, 0, o, w, w, _],
-                [_, w, 0, 0, x, o, w, _],
-                [w, w, 0, x, 0, 0, w, w],
-                [w, 0, 0, w, x, x, 0, w],
-                [w, 0, 0, p, 0, 0, 0, w],
-                [w, w, w, w, w, w, w, w],
-            ],
-            [
-                [_, w, w, w, w, w, w, w],
-                [w, w, 0, 0, 0, 0, w, _],
-                [w, 0, x, 0, x, x, 0, w],
-                [w, o, o, o, o, o, o, w],
-                [w, 0, x, x, 0, x, 0, w],
-                [w, w, w, 0, p, w, w, w],
-                [_, _, w, w, w, w, _, _],
-            ],
-            [
-                [w, w, w, w, w, w, w, w],
-                [w, o, 0, x | o, 0, 0, 0, w],
-                [w, 0, w, 0, x, w, o, w],
-                [w, 0, 0, 0, x, 0, o, w],
-                [w, w, w, w, x, 0, 0, w],
-                [w, p, 0, 0, 0, w, 0, w],
-                [w, o, x, 0, 0, 0, 0, w],
-                [w, w, w, w, w, w, w, w],
-            ],
-            [
-                [w, w, w, w, w, w, w, w, w, w, w],
-                [w, p, 0, 0, 0, w, 0, 0, 0, 0, w],
-                [w, 0, x, 0, o, x, o, 0, x, 0, w],
-                [w, 0, 0, o, 0, o, 0, o, 0, 0, w],
-                [w, w, w, w, o, w, o, w, w, w, w],
-                [w, 0, 0, x, 0, o, 0, x, 0, 0, w],
-                [w, 0, x, 0, 0, x, 0, 0, x, 0, w],
-                [w, 0, 0, 0, 0, w, 0, 0, 0, 0, w],
-                [w, w, w, w, w, w, w, w, w, w, w],
-            ],
-            [
-                [_, _, w, w, w, w, w, _],
-                [w, w, w, 0, 0, 0, w, _],
-                [w, o, p, x, 0, 0, w, _],
-                [w, w, w, 0, x, o, w, _],
-                [w, o, w, w, x, 0, w, _],
-                [w, 0, w, 0, o, 0, w, w],
-                [w, x, 0, o | x, x, x, o, w],
-                [w, 0, 0, 0, o, 0, 0, w],
-                [w, w, w, w, w, w, w, w],
-            ],
-            [
-                [_, w, w, w, w, w, w, _],
-                [_, w, 0, 0, o, p, w, w],
-                [_, w, 0, 0, 0, x, o, w],
-                [_, w, w, w, o | x, w, 0, w],
-                [w, w, 0, 0, 0, 0, 0, w],
-                [w, 0, 0, x, 0, 0, w, w],
-                [w, 0, 0, 0, w, w, w, _],
-                [w, w, w, w, w, _, _, _],
-            ],
-            [
-                [w, w, w, w, w, w, w, _, _],
-                [w, 0, 0, 0, 0, 0, w, _, _],
-                [w, 0, x, x, x, w, w, _, _],
-                [w, 0, 0, w, o, o, w, w, w],
-                [w, w, 0, 0, o, o, x, 0, w],
-                [_, w, 0, p, 0, 0, 0, 0, w],
-                [_, w, w, w, w, w, w, w, w],
-            ],
-            [
-                [_, _, _, _, w, w, w, w, w, _, _, _, _, _, _, _, _, _],
-                [_, _, _, _, w, 0, 0, 0, w, _, _, _, _, _, _, _, _, _],
-                [_, _, _, _, w, x, 0, 0, w, _, _, _, _, _, _, _, _, _],
-                [_, _, w, w, w, 0, 0, x, w, w, _, _, _, _, _, _, _, _, _],
-                [_, _, w, 0, 0, x, 0, x, 0, w, _, _, _, _, _, _, _, _, _],
-                [w, w, w, 0, w, 0, w, w, 0, w, _, _, _, w, w, w, w, w, w],
-                [w, 0, 0, 0, w, 0, w, w, 0, w, w, w, w, w, 0, 0, o, o, w],
-                [w, 0, x, 0, 0, x, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, o, o, w],
-                [w, w, w, w, w, 0, w, w, w, 0, w, p, w, w, 0, 0, o, o, w],
-                [_, _, _, _, w, 0, 0, 0, 0, 0, w, w, w, w, w, w, w, w, w],
-                [_, _, _, _, w, w, w, w, w, w, _, _, _, _, _, _, _, _, _],
-            ],
-            [
-                [_, _, _, _, _, w, w, w, w, w, w, w, _],
-                [_, _, _, _, _, w, 0, 0, w, 0, 0, w, _],
-                [_, _, _, _, _, w, 0, 0, x, x, 0, w, _],
-                [w, w, w, w, w, w, 0, x, w, 0, 0, w, _],
-                [w, o, o, o, w, w, w, 0, w, 0, 0, w, w],
-                [w, o, 0, 0, w, 0, 0, x, 0, w, 0, 0, w],
-                [w, o, 0, 0, 0, 0, x, 0, x, 0, x, 0, w],
-                [w, o, 0, 0, w, 0, 0, x, 0, w, 0, 0, w],
-                [w, o, o, o, w, w, w, 0, w, 0, 0, w, w],
-                [w, w, w, w, w, w, 0, x, 0, 0, 0, w, _],
-                [_, _, _, _, _, w, 0, p, w, 0, 0, w, _],
-                [_, _, _, _, _, w, w, w, w, w, w, w, _]
-            ],
-
-        ];
-
+        var mapArr = [];
+        for (let mapStr of mapStrArr) {
+            mapArr.push(XSB2Map(mapStr));
+        }
         function generateMap() {
             map = mapArr[level];
         }
@@ -455,67 +365,89 @@
                     let xx = j;
                     let yy = i;
                     if (map[i][j] != _) {
-                        var floor = document.createElement("div");
-                        floor.className = "floor";
-                        floor.style.left = xx * cellW + "px";
-                        floor.style.top = yy * cellW + "px";
-                        container.appendChild(floor);
-                        floors.push(floor);
+                        addFloorDom(xx, yy);
                     }
                     if (map[i][j] == p) {
-                        playerDom = document.createElement("div");
-                        playerDom.className = "player";
-                        playerDom.style.left = xx * cellW + "px";
-                        playerDom.style.top = yy * cellW + "px";
-                        container.appendChild(playerDom);
-                        player = { x: xx, y: yy, dom: playerDom };
+                        addPlayerDom(xx, yy);
                     } else if (map[i][j] == w) {
-                        var wall = document.createElement("div");
-                        wall.className = "wall";
-                        wall.style.top = yy * cellW + "px";
-                        wall.style.left = xx * cellW + "px";
-                        container.appendChild(wall);
-                        walls.push({ x: xx, y: yy, dom: wall });
+                        addWallDom(xx, yy);
                     } else if (map[i][j] == o) {
-                        var target = document.createElement("div");
-                        target.className = "target";
-                        target.style.top = yy * cellW + "px";
-                        target.style.left = xx * cellW + "px";
-                        container.appendChild(target);
-                        targets.push({ x: xx, y: yy, dom: target });
+                        addTargetDom(xx, yy);
                     } else if (map[i][j] == x) {
-                        var box = document.createElement("div");
-                        box.className = "box";
-                        box.style.top = yy * cellW + "px";
-                        box.style.left = xx * cellW + "px";
-                        container.appendChild(box);
-                        boxs.push({ x: xx, y: yy, dom: box });
+                        addBoxDom(xx, yy);
                     }
                     else if (map[i][j] == (x | o)) {
-                        var target = document.createElement("div");
-                        target.className = "target";
-                        target.style.top = yy * cellW + "px";
-                        target.style.left = xx * cellW + "px";
-                        container.appendChild(target);
-                        targets.push({ x: xx, y: yy, dom: target });
-                        var box = document.createElement("div");
-                        box.className = "box";
-                        box.style.top = yy * cellW + "px";
-                        box.style.left = xx * cellW + "px";
-                        container.appendChild(box);
-                        boxs.push({ x: xx, y: yy, dom: box });
-                        var clear = document.createElement("div");
-                        clear.className = "clear";
-                        clear.style.top = yy * cellW + "px";
-                        clear.style.left = xx * cellW + "px";
-                        container.appendChild(clear);
-                        clears.push({ x: xx, y: yy, dom: clear });
+                        addTargetDom(xx, yy);
+                        addBoxDom(xx, yy);
+                        addClearDom(xx, yy);
                         solve++;
+                    } else if (map[i][j] == (p | o)) {
+                        addTargetDom(xx, yy);
+                        addPlayerDom(xx, yy);
                     }
                 }
             }
             container.style.width = `${map[0].length * cellW}px`;
             container.style.height = `${map.length * cellW}px`;
+        }
+
+        function addFloorDom(xx, yy) {
+            var floor = document.createElement("div");
+            floor.className = "floor";
+            floor.style.left = xx * cellW + "px";
+            floor.style.top = yy * cellW + "px";
+            container.appendChild(floor);
+            floors.push(floor);
+        }
+
+        function addWallDom(xx, yy) {
+            var wall = document.createElement("div");
+            wall.className = "wall";
+            wall.style.top = yy * cellW + "px";
+            wall.style.left = xx * cellW + "px";
+            container.appendChild(wall);
+            walls.push({ x: xx, y: yy, dom: wall });
+        }
+
+        function addPlayerDom(xx, yy) {
+            let playerDom = document.createElement("div");
+            playerDom.className = "player";
+            playerDom.style.left = xx * cellW + "px";
+            playerDom.style.top = yy * cellW + "px";
+            container.appendChild(playerDom);
+            player = { x: xx, y: yy, dom: playerDom };
+        }
+
+        function addTargetDom(xx, yy) {
+            var target = document.createElement("div");
+            target.className = "target";
+            target.style.top = yy * cellW + "px";
+            target.style.left = xx * cellW + "px";
+            container.appendChild(target);
+            var heart = document.createElement("div");
+            heart.className = "heart";
+            target.appendChild(heart);
+            heart.style.left = '20px'; // 将heart移动到目标中心位置
+            heart.style.top = '20px';
+            targets.push({ x: xx, y: yy, dom: target });
+        }
+
+        function addBoxDom(xx, yy) {
+            var box = document.createElement("div");
+            box.className = "box";
+            box.style.top = yy * cellW + "px";
+            box.style.left = xx * cellW + "px";
+            container.appendChild(box);
+            boxs.push({ x: xx, y: yy, dom: box });
+        }
+
+        function addClearDom(xx, yy) {
+            var clear = document.createElement("div");
+            clear.className = "clear";
+            clear.style.top = yy * cellW + "px";
+            clear.style.left = xx * cellW + "px";
+            container.appendChild(clear);
+            clears.push({ x: xx, y: yy, dom: clear });
         }
 
         function boxIdx(xx, yy) {
@@ -581,12 +513,7 @@
             }
             if (targetIdx(xx, yy) != -1) {
                 solve++;
-                var clear = document.createElement("div");
-                clear.className = "clear";
-                clear.style.top = yy * cellW + "px";
-                clear.style.left = xx * cellW + "px";
-                container.appendChild(clear);
-                clears.push({ x: xx, y: yy, dom: clear });
+                addClearDom(xx, yy);
             }
             boxs[i].x = xx;
             boxs[i].y = yy;
@@ -598,6 +525,7 @@
         function movePlayer(direction) {
             var xx = player.x;
             var yy = player.y;
+            player.dom.style.backgroundImage = `url('img/baby_${direction}.png')`;
             if (direction == "left") {
                 xx--;
             } else if (direction == "right") {
