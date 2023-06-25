@@ -117,7 +117,7 @@
             background-size: 40px;
             background-repeat: no-repeat;
             background-position: center;
-            /* animation: gif 5s infinite; */
+            animation: gif 1s;
             /* 使图片填充整个元素 */
             position: absolute;
             top: 0;
@@ -127,39 +127,25 @@
             z-index: 1;
         }
 
-
-        #preload-player_up {
-            background: url('img/baby_up.png') no-repeat -9999px -9999px;
-        }
-
-        #preload-player_left {
-            background: url('img/baby_left.png') no-repeat -9999px -9999px;
-        }
-
-        #preload-player_right {
-            background: url('img/baby_right.png') no-repeat -9999px -9999px;
-        }
-
-
         @keyframes gif {
             0% {
-                background: url('img/sokoban_player_1.png') no-repeat center;
+                background-image: url('img/baby_down.png');
             }
 
             25% {
-                background: url('img/sokoban_player_2.png') no-repeat center;
+                background-image: url('img/baby_up.png');
             }
 
             50% {
-                background: url('img/sokoban_player_1.png') no-repeat center;
+                background-image: url('img/baby_left.png');
             }
 
             75% {
-                background: url('img/sokoban_player_2.png') no-repeat center;
+                background-image: url('img/baby_right.png');
             }
 
             100% {
-                background: url('img/sokoban_player_1.png') no-repeat center;
+                background-image: url('img/baby_down.png');
             }
         }
 
@@ -338,9 +324,6 @@
     <div class="center-div">
         <h3><a href="index.html">更多小游戏</a></h3>
     </div>
-    <div class="preload-player_up"></div>
-    <div class="preload-player_left"></div>
-    <div class="preload-player_right"></div>
     <script src="js/picker.min.js"></script>
     <script src="js/sokoban.js"></script>
     <!-- <script src="js/gif.js"></script> -->
