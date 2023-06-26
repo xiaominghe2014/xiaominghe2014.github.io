@@ -9,12 +9,12 @@
     <style type="text/css">
         body {
             margin: 0;
-            padding: 0;
+            padding: 10px;
             background-color: #f5f5f5;
         }
 
         #container {
-            margin: 0 auto;
+            margin: 20px auto;
             width: fit-content;
             height: fit-content;
             background-color: #f5f5f5;
@@ -240,6 +240,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
 
         .button-container>div {
@@ -257,8 +258,88 @@
             text-decoration: none;
             display: inline-block;
             font-size: 16px;
-            margin: 4px 2px;
+            margin: 2px 4px;
             cursor: pointer;
+            background-size: cover;
+        }
+
+        .img_button {
+
+            background-size: cover;
+            background-color: rgb(0, 174, 255);
+            border-radius: 5px;
+            color: black;
+            cursor: pointer;
+            font-size: 16px;
+
+            padding: 10px 20px;
+
+            text-align: center;
+
+            text-decoration: none;
+
+            display: inline-block;
+
+            margin: 5px 5px;
+
+            cursor: pointer;
+
+            border-radius: 4px;
+
+        }
+
+        .up_button {
+            background-image: url('img/up_arrow_icon.svg');
+            background-size: 72px;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 100px;
+            height: 72px;
+        }
+
+        .down_button {
+            background-image: url('img/down_arrow_icon.svg');
+            background-size: 72px;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 100px;
+            height: 72px;
+        }
+
+        .left_button {
+            background-image: url('img/left_arrow_icon.svg');
+            background-size: 72px;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 100px;
+            height: 72px;
+        }
+
+        .right_button {
+            background-image: url('img/right_arrow_icon.svg');
+            background-size: 72px;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 100px;
+            height: 72px;
+        }
+
+        .restart_button {
+            background-image: url('img/refresh_reload_icon.svg');
+            background-size: 64px;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 150px;
+            height: 72px;
+        }
+
+        .more_button {
+            background-image: url('img/more_navigation_icon.svg');
+            background-size: 64px;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 150px;
+            height: 72px;
         }
 
         .step {
@@ -307,19 +388,19 @@
     <div class="bottom-container">
         <div class="button-container">
             <div>
-                <button id="upBtn" class="button">上</button>
+                <button id="upBtn" class="img_button up_button"></button>
             </div>
             <div>
-                <button id="leftBtn" class="button">左</button>
-                <button id="downBtn" class="button">下</button>
-                <button id="rightBtn" class="button">右</button>
+                <button id="leftBtn" class="img_button left_button"></button>
+                <button id="downBtn" class="img_button down_button"></button>
+                <button id="rightBtn" class="img_button right_button"></button>
             </div>
         </div>
     </div>
     <div class="step">
         <span id="stepDom">level 1 步数: 0</span>
-        <button id="startBtn" class="button">关卡选择</button>
-        <button id="resetBtn" class="button">重玩本关</button>
+        <button id="startBtn" class="img_button more_button"></button>
+        <button id="resetBtn" class="img_button restart_button"></button>
     </div>
     <div class="center-div">
         <h3><a href="index.html">更多小游戏</a></h3>
