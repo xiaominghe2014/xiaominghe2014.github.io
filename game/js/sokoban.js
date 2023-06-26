@@ -316,19 +316,38 @@ let mapStrArr = [
         "____#-----#########",
         "____######_________",
     ],
+
+    //uluu3l5u3rurr4d4l4r4ulld3l
+    //4drd6lul3duu6ruu5rdd8ldlur
+    //ulldluuruluu6r3d4rdrd8ldlu
+    //rulldl3urul4d9ruru3ldl3udd
+    //5r4ulld9l5d12r5d4l4uru8lu
+    //ddu11r5u10ldluruld6r3d3rur
+    //uru10ldlu5d8rddrruluurrd
+    //10luld8r5drr9uru9l4r5d5l
+    //5u5d11rdlldl3uru3ldl3udd
+    //4r3u8l8rdr3dlddrru9ldlur
+    //uldl3u3d11r4dldl3uluurrd
+    //lldluru6ldluruldluudd9r4
+    //ldl4uru6ldlurulldluudd8r
+    //3drdruuluurrdlldluru6ldl
+    //urulldlud12rdd3ldluuru6l
+    //dlurulld11r3d3ldl3uru8l
     [
-        "_____#######_",
-        "_____#--#--#_",
-        "_____#--$$-#_",
-        "######-$#--#_",
-        "#...###-#--##",
-        "#.--#--$-#--#",
-        "#.----$-$-$-#",
-        "#.--#--$-#--#",
-        "#...###-#--##",
-        "######-$---#_",
-        "_____#-@#--#_",
-        "_____#######_",
+        "#####_____#####_",
+        "#...#######---#_",
+        "#.-.--------$-#_",
+        "#.-.####-###$-#_",
+        "#...#--#-##-$-#_",
+        "_#.-####----$-#_",
+        "_#.---##--#-$-##",
+        "_#.---------$--#",
+        "_#.#--####-$$$-#",
+        "_#.####__#-$-$-#",
+        "_#.#_____#-$@$-#",
+        "_###_____#-$$$-#",
+        "_________#-----#",
+        "_________#######",
     ],
 
     //无人区
