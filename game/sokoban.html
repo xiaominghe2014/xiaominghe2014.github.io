@@ -747,20 +747,24 @@
 
             var answerBtn = document.getElementById("answerBtn");
             answerBtn.addEventListener("click", function () {
+                let answer = mapStrArr[level].lrud;
+                if(answer.length==0){
+                    alert("本关暂时不支持你开挂，期待下一次吧，😂");
+                    return;
+                }
                 showAnswers = true;
                 clearUI();
                 init();
-                let answer = mapStrArr[level].lrud;
                 let iter = nextMove(answer);
                 let n = iter.next();
-                let t = 10;
+                let t = 100;
                 while (!n.done) {
                     let d = n.value
                     let i = setTimeout(() => {
                         showAnswers && movePlayer(d);
                     }, t);
                     answersTimer.push(i);
-                    t += 10;
+                    t += 100;
                     n = iter.next();
                 }
             });

@@ -100,7 +100,7 @@ function* nextMove(lrud) {
 let mapStrArr = [
     // 入门
     {
-        lrud: "",
+        lrud: "r",
         map: [
             "#####",
             "#@$.#",
@@ -108,7 +108,7 @@ let mapStrArr = [
         ],
     },
     {
-        lrud: "",
+        lrud: "dlu3rdlullddruluruuldrddrruldluu",
         map: [
             "####__",
             "#-.#__",
@@ -120,7 +120,7 @@ let mapStrArr = [
         ],
     },
     {
-        lrud: "",
+        lrud: "rddlruulduullddr",
         map: [
             "######",
             "#----#",
@@ -132,7 +132,7 @@ let mapStrArr = [
         ],
     },
     {
-        lrud: "",
+        lrud: "ruu3luld4rddluru3ldd3luurrdrdl3urdd",
         map: [
             "__####___",
             "###--####",
@@ -143,7 +143,7 @@ let mapStrArr = [
         ],
     },
     {
-        lrud: "",
+        lrud: "ulldldruurrdllrrddlurul",
         map: [
             "########",
             "#------#",
@@ -154,7 +154,7 @@ let mapStrArr = [
         ],
     },
     {
-        lrud: "",
+        lrud: "lulduu3rdlrrddlulldrd3lur",
         map: [
             "_#######",
             "_#-----#",
