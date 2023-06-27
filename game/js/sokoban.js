@@ -70,27 +70,50 @@ function* nextMove(lrud) {
         if (isNumber(char)) {
             lStr += char;
         } else {
-            if (char === 'l') {
-                current = "left"
-            }
-            if (char === 'r') {
-                current = "right"
-            }
-            if (char === 'u') {
-                current = "up"
-            }
-            if (char === 'd') {
-                current = "down"
-            }
             if (lStr.length > 1) {
                 moveCount = parseInt(lStr);
             } else {
                 moveCount = 1;
             }
             lStr = "0";
-            for (let j = 0; j < moveCount; j++) {
-                yield current;
+            if(char === '('){
+                //search next )
+                let s = i;
+                for (i = i+1; i < moveCount; i++) {
+                    let closeChar = lrud.charAt(i);
+                    if(closeChar === ')'){
+                        e = i;
+                        break;
+                    }
+                }
+                let newLrud = lrud.substring(s+1,e);
+                for (let j = 0; j < moveCount; j++) {
+                    let iter = nextMove(newLrud);
+                    let n = iter.next();
+                    while (!n.done) {
+                        let d = n.value;
+                        n = iter.next();
+                        yield d;
+                    }
+                }
+            }else{
+                if (char === 'l') {
+                    current = "left"
+                }
+                if (char === 'r') {
+                    current = "right"
+                }
+                if (char === 'u') {
+                    current = "up"
+                }
+                if (char === 'd') {
+                    current = "down"
+                }
+                for (let j = 0; j < moveCount; j++) {
+                    yield current;
+                }
             }
+
         }
     }
 }
@@ -194,7 +217,7 @@ let mapStrArr = [
     },
 
     {
-        lrud: "d11luurd",
+        lrud: "d11luurdld10r6lulldlluurdldrrurrdrru4ldlluurdrdrru4ldrru4rdrru6lrrdrru4ldrr4luurdldrru6rdrru8ldlluurd3rdlu3rdllu4rd3lu7rd",
         map: [
             "####___________",
             "#--############",
@@ -204,7 +227,7 @@ let mapStrArr = [
         ],
     },
     {
-        lrud: "ruldll4u3rd",
+        lrud: "ruldll4u3rdlull4drr3uruldlr3dll3uddrdr",
         map: [
             "######",
             "#...-#",
@@ -323,7 +346,7 @@ let mapStrArr = [
             ],
     },
     {
-        lrud: "r",
+        lrud: "luurruuddllddrr3u3drruld3l3u3rd3lddrruuruldluuddrddruu",
         map:
             [
                 "__####__",
@@ -338,7 +361,7 @@ let mapStrArr = [
     },
 
     {
-        lrud: "",
+        lrud: "drurd3rurrdrd3luurdl5d3ruulldl3udd3rdlldluulldd3lurrdr4u3dllurdrudrrdrurull",
         map:
             [
                 "###########",
@@ -440,7 +463,34 @@ let mapStrArr = [
                 "######__"
             ],
     },
-
+    {
+        lrud:"rruruldd4lulururrdduull3drr3urr4drdldll3ulldldrdrl3urrddlruull3u4r3dllddrluurr3u4l4dldrdrr3ulr3dll3u4r3ulldduurr3dll3dll3urrddlr5ulldduurrdlu3r4drdldlr6ull5drluurluur",
+        map: [
+            "_#######_",
+            "##-----##",
+            "#-*-$-*-#",
+            "#--#-#--#",
+            "##.-@-.##",
+            "#--#-#--#",
+            "#-*-$-*-#",
+            "##-----##",
+            "_#######_",
+        ],
+    },
+    {
+        lrud: "ldrddlull3uruurrdru3lddl3d3ruuldruuruu3lddlddrluurdrrulrruuldrdl4drruur3ulrdlrddluu4dlluurluurdl3urdldd3ruul",
+        map: [
+            "_#######_",
+            "##----###",
+            "##-*-*--#",
+            "#-*.$.*-#",
+            "#--$@$--#",
+            "#-*.$.*-#",
+            "#--*-*-##",
+            "###----##",
+            "_#######_",
+        ],
+    },
     {
         lrud: "u3l3ululldll3d11rurd12lulld13rdrrlu7l3ulull3duull3d11rurrld7l3ullul3duull3d11rdru7l3ull3urdduull5duull3d13r8l3ullul3duull3d12rlur",
         map:
@@ -479,39 +529,6 @@ let mapStrArr = [
             "_________#######",
         ]
     },
-
-    //无人区
-    // [
-    //     "###########",
-    //     "#----.----#",
-    //     "#--$.$.$--#",
-    //     "###.$.$.###",
-    //     "__##.$.##__",
-    //     "___#$.$#___",
-    //     "___#-$-#___",
-    //     "___#-@-#___",
-    //     "___#####___",
-    // ],
-    // [
-    //     "_________####_",
-    //     "##########--#_",
-    //     "#-----------#_",
-    //     "#--********-#_",
-    //     "_#-*------*-#_",
-    //     "_#-*-####-*-#_",
-    //     "_#-*-#__#-*-#_",
-    //     "_#-*-#__#-*-#_",
-    //     "_#-*-####-*-#_",
-    //     "_#-*----#-*-#_",
-    //     "_#-****.#-*-#_",
-    //     "_#------#-*-#_",
-    //     "_#--#####-*-#_",
-    //     "_####__#--*-##",
-    //     "_______#-**--#",
-    //     "_______#---$@#",
-    //     "_______###--#_",
-    //     "_________####_",
-    // ],
 ];
 
 
