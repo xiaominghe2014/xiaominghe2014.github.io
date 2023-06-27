@@ -407,6 +407,9 @@
         <button id="resetBtn" class="img_button restart_button"></button>
     </div>
     <div class="center-div">
+        <button class="button" id="answerBtn"> 开挂 </button>
+    </div>
+    <div class="center-div">
         <h3><a href="index.html">更多小游戏</a></h3>
     </div>
     <script src="js/picker.min.js"></script>
@@ -419,7 +422,7 @@
         ];
         var mapArr = [];
         for (let mapStr of mapStrArr) {
-            mapArr.push(XSB2Map(mapStr));
+            mapArr.push(XSB2Map(mapStr.map));
         }
         function generateMap() {
             map = mapArr[level];
@@ -442,7 +445,8 @@
         //     workers: 2,
         //     quality: 10
         // });
-
+        var showAnswers = false;
+        var answersTimer = [];
         function init() {
             stepsDom.innerHTML = `第${level + 1}关   步数: ${steps}`;
             for (var i = 0; i < map.length; i++) {
@@ -677,6 +681,7 @@
         }
 
         function start() {
+            stopShowAnswer();
             const loading = document.createElement("div");
             loading.className = "loading";
             document.body.appendChild(loading);
@@ -687,11 +692,22 @@
             document.body.removeChild(loading);
         }
 
+        function stopShowAnswer() {
+            if (showAnswers) {
+                showAnswers = false;
+                for (let i of answersTimer) {
+                    clearTimeout(i);
+                }
+                answersTimer = [];
+            }
+        }
+
         function addKeyListener() {
             document.onkeydown = function (event) {
                 // if (isGameOver) {
                 //     return;
                 // }
+
                 var e = event || window.event || arguments.callee.caller.arguments[0];
                 if (e && e.keyCode == 37) {
                     movePlayer("left");
@@ -724,23 +740,48 @@
             });
             var resetBtn = document.getElementById("resetBtn");
             resetBtn.addEventListener("click", function () {
+                stopShowAnswer();
                 clearUI();
                 init();
             });
 
+            var answerBtn = document.getElementById("answerBtn");
+            answerBtn.addEventListener("click", function () {
+                showAnswers = true;
+                clearUI();
+                init();
+                let answer = mapStrArr[level].lrud;
+                let iter = nextMove(answer);
+                let n = iter.next();
+                let t = 10;
+                while (!n.done) {
+                    let d = n.value
+                    let i = setTimeout(() => {
+                        showAnswers && movePlayer(d);
+                    }, t);
+                    answersTimer.push(i);
+                    t += 10;
+                    n = iter.next();
+                }
+            });
+
             document.getElementById("upBtn").addEventListener("click", function () {
+                stopShowAnswer();
                 movePlayer("up");
             });
 
             document.getElementById("downBtn").addEventListener("click", function () {
+                stopShowAnswer();
                 movePlayer("down");
             });
 
             document.getElementById("leftBtn").addEventListener("click", function () {
+                stopShowAnswer();
                 movePlayer("left");
             });
 
             document.getElementById("rightBtn").addEventListener("click", function () {
+                stopShowAnswer();
                 movePlayer("right");
             });
         }
