@@ -166,7 +166,7 @@ let mapStrArr = [
         ],
     },
     {
-        lrud: "",
+        lrud: "lluuruluu4r3dluruulldull3drrddlud3rul",
         map: [
             "#######",
             "#-----#",
@@ -180,7 +180,7 @@ let mapStrArr = [
     },
 
     {
-        lrud: "",
+        lrud: "uululldrdrluurdrddrddllurdrulurluulldrurddrddllurd3ruul",
         map: [
             "#####____",
             "#---##___",
@@ -194,7 +194,7 @@ let mapStrArr = [
     },
 
     {
-        lrud: "",
+        lrud: "d11luurd",
         map: [
             "####___________",
             "#--############",
@@ -204,7 +204,7 @@ let mapStrArr = [
         ],
     },
     {
-        lrud: "",
+        lrud: "ruldll4u3rd",
         map: [
             "######",
             "#...-#",
@@ -216,7 +216,7 @@ let mapStrArr = [
         ],
     },
     {
-        lrud: "",
+        lrud: "dlluururdrulldlddrrudlluururrdlddlluuluuru3r",
         map: [
             "_######",
             "##----#",
@@ -442,7 +442,7 @@ let mapStrArr = [
     },
 
     {
-        lrud: "",
+        lrud: "u3l3ululldll3d11rurd12lulld13rdrrlu7l3ulull3duull3d11rurrld7l3ullul3duull3d11rdru7l3ull3urdduull5duull3d13r8l3ullul3duull3d12rlur",
         map:
             [
                 "____#####__________",

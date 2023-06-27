@@ -747,6 +747,9 @@
 
             var answerBtn = document.getElementById("answerBtn");
             answerBtn.addEventListener("click", function () {
+                if(showAnswers){
+                   return; 
+                }
                 let answer = mapStrArr[level].lrud;
                 if(answer.length==0){
                     alert("本关暂时不支持你开挂，期待下一次吧，😂");
