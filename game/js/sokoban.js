@@ -229,7 +229,7 @@ let mapStrArr = [
         ],
     },
     {
-        lrud: "",
+        lrud: "dlludluluurdrddl",
         map: [
             "####___",
             "#--####",
@@ -240,7 +240,7 @@ let mapStrArr = [
         ],
     },
     {
-        lrud: "",
+        lrud: "urrll3drururu",
         map:
             [
                 "######",
@@ -253,7 +253,7 @@ let mapStrArr = [
             ],
     },
     {
-        lrud: "",
+        lrud: "ulu3lddrulururrdlrdllddrruruluull3dldr3uldduu3rdluldd",
         map:
             [
                 "__####_",
@@ -266,7 +266,7 @@ let mapStrArr = [
             ],
     },
     {
-        lrud: "",
+        lrud: "rr4drddllurdrulu3rdruu",
         map:
             [
                 "#####____",
@@ -281,7 +281,7 @@ let mapStrArr = [
             ],
     },
     {
-        lrud: "",
+        lrud: "3r",
         map:
             [
                 "_#######__",
@@ -294,7 +294,7 @@ let mapStrArr = [
             ],
     },
     {
-        lrud: "",
+        lrud: "r",
         map:
             [
                 "__####",
@@ -309,7 +309,7 @@ let mapStrArr = [
             ],
     },
     {
-        lrud: "",
+        lrud: "r",
         map:
             [
                 "_####_",
@@ -323,7 +323,7 @@ let mapStrArr = [
             ],
     },
     {
-        lrud: "",
+        lrud: "r",
         map:
             [
                 "__####__",
