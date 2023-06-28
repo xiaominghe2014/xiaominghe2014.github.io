@@ -361,15 +361,15 @@ let mapStrArr = [
     },
 
     {
-        lrud: "drurd3rurrdrd3luurdl5d3ruulldl3udd3rdlldluulldd3lurrdr4u3dllurdrudrrdrurull",
+        lrud: "drurdrdrrull3rurrdluldrdllullulld4rurdl5d3rulldl4u3drruldlulldd3lurrdr4u3dllurdrudrrdrurull",
         map:
             [
                 "###########",
                 "#@---#----#",
                 "#-$-.$.-$-#",
-                "#--.-.-.--#",
-                "####.#.####",
-                "#--$-.-$--#",
+                "##-.-.-.-##",
+                "_###.#.###_",
+                "##-$-.-$-##",
                 "#-$--$--$-#",
                 "#----#----#",
                 "###########",
