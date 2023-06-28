@@ -561,9 +561,9 @@ let mapStrArr = [
         //xsokoban 29
         lrud:"d5lddrdrru5rdlu4ldllulld3rll5urdu4rdrrdrrurrdl4drddlulldllurrl3u6l6r3d3ldllu4rdr3uru6ldll3uruul4dldrrl4ulluulul4dlddrddlddrurrdrru4r4ldllu4rdrrurrdrrul3u6ldllur3ulluull3dlddrddld3r2(drrurr)dr3uru5l4r3d3ldllu4rdr3uru4l3r3d7ldllu8rdr3uru3lrr3d11l3uluur4dld11rdr3urullr3d11l8urr3drur3dldr5u5rdd4l4rurrdrrurrdl4drddlulldl3urul3d11l8urrddrr3d4u3rdurrdd4l4rurrdrrurrdl4drd3ldl3udd11l8u2(rrdd)u5rurrdrrur5drd3ldluu",
         map:[
-            "#####_____________",
-            "#   ##____________",
-            "# $  #########____",
+            "#####______________",
+            "#   ##_____________",
+            "# $  #########_____",
             "## # #       ######",
             "## #   $#$#@  #   #",
             "#  #      $ #   $ #",
@@ -576,6 +576,29 @@ let mapStrArr = [
             "###################",
         ]
     },
+    {
+        //xsokoban 89
+        lrud:"luurdlddr4d4r5uluullrrddrruullddr7drddlullu7l5ur6u4ru7rd4r8d4l3u3r3l3d4r6uluurrdl7dl3(lu)3rll3d3r7urulldulu7ld6l6dl5d7rdrr6uru5rll3d3r6uluurrd4lurddrr3d6lulluurrddld6rll3d3r6uluurrdl4d7l6drddl7ulu7rll3dluudd4r7urulldr4d6ldllu7rll3d3r6ulluu3rdluldr4d7l4d4luulldld6r3l4u10rll3d3r6uluurrd3lrr4d7l6drddl7ulu7rll3d3r6uluurrdlulddr3d13l3dld6r3luurulu10rll3d3r6uluurrdllr4d7l6drddl7ulu7rll3d3r6uluurrdl4d7l6d3rurrd4ldl6ulu7rll3d3r6u3d7l7dllu7l5ur7u4rdrru5rd3rdurrdl4d12luul5dld6rll3ulu10rll3d3r8u4lu5ldllu6r10l7dl5d7rdrr6ulu7rll3d3r7uru4l3r5d10l3drrdr3ulu7rll3d3r7uru3lrr5d12luurdld11rll3d3r7urullr5d11luuru3rur3dld6rll3d3r7urul5d12l3u5rur3dld6rll3d3r7u4d6l3ulldduullddrd8rll3d3r6u3d6l3ullddld8rll3d3r5udd6lu5ld10rll3d3r4u",
+        map:[
+            "_##################_",
+            "_#   $       ...#.##",
+            "_#       ####..... #",
+            "_# #######  #..... #",
+            "_# #    $ $ ##....##",
+            "_# #  $ # # ###...#_",
+            "_# # $@$ $  ##### #_",
+            "## #  $  $ $$   $ #_",
+            "#  #$# $#   # $## #_",
+            "# ##    ## ## $ # #_",
+            "# # $# $ $  #     #_",
+            "# #         #######_",
+            "# ########$##   #___",
+            "#        #  $   #___",
+            "########    #####___",
+            "_______###  #_______",
+            "_________####_______",
+        ]
+    }
 ];
 
 
