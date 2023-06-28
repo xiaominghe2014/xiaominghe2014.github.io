@@ -40,10 +40,10 @@ function XSB2Map(xsbArr) {
             if (c === char_goal) {
                 arr.push(o);
             }
-            if (c === char_floor) {
+            if (c === char_floor || c == ' ') {
                 arr.push(f);
             }
-            if (c === char_no || c == ' ') {
+            if (c === char_no) {
                 arr.push(_);
             }
         }
@@ -555,6 +555,25 @@ let mapStrArr = [
             "_###_____#-$$$-#",
             "_________#-----#",
             "_________#######",
+        ]
+    },
+    {
+        //xsokoban 29
+        lrud:"d5lddrdrru5rdlu4ldllulld3rll5urdu4rdrrdrrurrdl4drddlulldllurrl3u6l6r3d3ldllu4rdr3uru6ldll3uruul4dldrrl4ulluulul4dlddrddlddrurrdrru4r4ldllu4rdrrurrdrrul3u6ldllur3ulluull3dlddrddld3r2(drrurr)dr3uru5l4r3d3ldllu4rdr3uru4l3r3d7ldllu8rdr3uru3lrr3d11l3uluur4dld11rdr3urullr3d11l8urr3drur3dldr5u5rdd4l4rurrdrrurrdl4drddlulldl3urul3d11l8urrddrr3d4u3rdurrdd4l4rurrdrrurrdl4drd3ldl3udd11l8u2(rrdd)u5rurrdrrur5drd3ldluu",
+        map:[
+            "#####_____________",
+            "#   ##____________",
+            "# $  #########____",
+            "## # #       ######",
+            "## #   $#$#@  #   #",
+            "#  #      $ #   $ #",
+            "#  ### ######### ##",
+            "#  ## ..*..... # ##",
+            "## ## *.*..*.* # ##",
+            "# $########## ##$ #",
+            "#  $   $  $    $  #",
+            "#  #   #   #   #  #",
+            "###################",
         ]
     },
 ];
