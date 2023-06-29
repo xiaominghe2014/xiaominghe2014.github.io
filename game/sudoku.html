@@ -171,7 +171,10 @@
 
             // 调用dlx.js文件中的solveStandardSudoku方法解决数独问题
             var solution = dlx.solveStandardSudoku(sudokuStr, rowCount); // 这里的3表示数独的宫格大小，根据您的实际情况进行调整
-
+            if(solution==null){
+                alert("请检查你填的数，没有合理的解决方案");
+                return;
+            }
             // 将解决方案显示在表格中
 
             for (var i = 0; i < rowCount; i++) {
