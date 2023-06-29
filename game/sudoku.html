@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>数独自动求解方案</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="js/dlx.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+
+        td {
+            width: 40px;
+            height: 40px;
+            border: 2px solid black;
+            text-align: center;
+            background-color: lightblue;
+        }
+
+        input {
+            width: 90%;
+            height: 90%;
+            padding: 2px;
+            border: none;
+            text-align: center;
+            font-size: larger;
+        }
+
+        button {
+            background-color: rgba(200, 255, 0, 0.674);
+            border-radius: 5px;
+            color: black;
+            padding: 20px 40px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 20px;
+            margin: 10px 4px;
+            cursor: pointer;
+            background-size: cover;
+        }
+
+        .center-div {
+            margin: 0 auto;
+            /* 水平居中 */
+            width: 50%;
+            /* 设置宽度为父元素宽度的一半 */
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="center-div">
+        <table id="sudokuTable">
+            <!-- 表格内容将由JavaScript动态生成 -->
+        </table>
+    </div>
+    <div class="center-div">
+        <button id="setButton">重置</button>
+        <button id="solveButton">求解</button>
+    </div>
+    <div class="center-div">
+        <h3><a href="index.html">更多小游戏</a></h3>
+    </div>
+    <script>
+        // 获取表格容器和按钮元素
+        var table = document.getElementById("sudokuTable");
+        var setButton = document.getElementById("setButton");
+        var solveButton = document.getElementById("solveButton");
+
+        function initBoard(width, height) {
+            // 清空表格
+            table.innerHTML = "";
+
+            // 动态生成表格
+            for (var i = 0; i < height; i++) {
+                var row = document.createElement("tr");
+                for (var j = 0; j < width; j++) {
+                    var cell = document.createElement("td");
+                    var input = document.createElement("input");
+                    input.type = "number";
+                    input.style.color = "blue";
+                    // input.value = 0;
+                    cell.appendChild(input);
+                    row.appendChild(cell);
+                }
+                table.appendChild(row);
+            }
+
+            // 获取所有的输入框元素
+            var inputs = document.querySelectorAll("input[type='number']");
+
+            // 为每个输入框添加事件监听器
+            inputs.forEach(function (input) {
+                input.addEventListener("input", function () {
+                    
+                    // 获取输入之前的值
+                    var oldValue = this.value;
+
+                    
+                    // 获取输入框中的值
+                    var value = parseInt(input.value);
+
+                    // 验证输入的值是否在1-9之间
+                    if (value < 1 || value > 9 || isNaN(value)) {
+                        // 如果输入的值不在1-9之间或者不是一个数字，则将输入框的值设置为1
+                        input.value = 1;
+                    }
+                    input.style.color = "blue";
+                });
+            });
+        }
+        // 设置按钮点击事件处理程序
+        setButton.addEventListener("click", function () {
+            // var width = prompt("请输入表格宽度：");
+            // var height = prompt("请输入表格高度：");
+            initBoard(9, 9);
+
+        });
+
+        initBoard(9, 9);
+
+        // 解决按钮点击事件处理程序
+        solveButton.addEventListener("click", function () {
+            // 在这里编写解决数独的代码
+            // 获取表格的行数和列数
+            var rowCount = table.rows.length;
+            var colCount = table.rows[0].cells.length;
+
+            // 输出表格的长宽
+            // console.log("表格的行数：" + rowCount);
+            // console.log("表格的列数：" + colCount);
+            // 遍历表格的每个单元格
+            var sudokuStr = "";
+            for (var i = 0; i < rowCount; i++) {
+                for (var j = 0; j < colCount; j++) {
+                    // 获取当前单元格的输入框
+                    var input = table.rows[i].cells[j].querySelector("input");
+
+                    // 获取输入框中的值
+                    var value = input.value;
+                    if (value.length == 0 || input.style.color == "red") {
+                        value = 0;
+                    }
+                    // 输出当前单元格的值
+                    // console.log("第 " + (i + 1) + " 行，第 " + (j + 1) + " 列的值：" + value);
+                    sudokuStr += value;
+                }
+            }
+
+            // 调用dlx.js文件中的solveStandardSudoku方法解决数独问题
+            var solution = dlx.solveStandardSudoku(sudokuStr, rowCount); // 这里的3表示数独的宫格大小，根据您的实际情况进行调整
+
+            // 将解决方案显示在表格中
+
+            for (var i = 0; i < rowCount; i++) {
+                for (var j = 0; j < colCount; j++) {
+                    // 获取当前单元格的输入框
+                    var input = table.rows[i].cells[j].querySelector("input");
+                    // 将解决方案中的值设置到输入框中
+                    if(input.value.length==0 || input.style.color == "red"){
+                        input.style.color = "red";
+                    }else{
+                        input.style.color = "blue";
+                    }
+                    input.value = solution[i*9+j];
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
