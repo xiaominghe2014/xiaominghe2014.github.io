@@ -9,17 +9,36 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="js/dlx.js"></script>
     <style>
+
         table {
             border-collapse: collapse;
         }
 
         td {
-            width: 40px;
-            height: 40px;
+            width: 55px;
+            height: 55px;
             border: 2px solid black;
             text-align: center;
+            vertical-align: middle;
             background-color: lightblue;
         }
+
+        /* 添加九宫格格子的边框 */
+        /* td:nth-child(3n+1):not(:first-child) {
+            border-left: 2px solid black;
+        }
+
+        td:nth-child(3n):not(:last-child) {
+            border-right: 2px solid black;
+        }
+
+        tr:nth-child(3n+1):not(:first-child) td {
+            border-top: 2px solid black;
+        }
+
+        tr:nth-child(3n):not(:last-child) td {
+            border-bottom: 2px solid black;
+        } */
 
         input {
             width: 90%;
@@ -47,19 +66,16 @@
         .center-div {
             margin: 0 auto;
             /* 水平居中 */
-            width: 50%;
+            width: 100%;
             /* 设置宽度为父元素宽度的一半 */
         }
-
     </style>
 </head>
 
 <body>
-    <div class="center-div">
-        <table id="sudokuTable">
-            <!-- 表格内容将由JavaScript动态生成 -->
-        </table>
-    </div>
+    <table id="sudokuTable">
+        <!-- 表格内容将由JavaScript动态生成 -->
+    </table>
     <div class="center-div">
         <button id="setButton">重置</button>
         <button id="solveButton">求解</button>
@@ -98,18 +114,18 @@
             // 为每个输入框添加事件监听器
             inputs.forEach(function (input) {
                 input.addEventListener("input", function () {
-                    
+
                     // 获取输入之前的值
                     var oldValue = this.value;
 
-                    
+
                     // 获取输入框中的值
                     var value = parseInt(input.value);
 
                     // 验证输入的值是否在1-9之间
                     if (value < 1 || value > 9 || isNaN(value)) {
                         // 如果输入的值不在1-9之间或者不是一个数字，则将输入框的值设置为1
-                        input.value = 1;
+                        input.value = "";
                     }
                     input.style.color = "blue";
                 });
@@ -163,12 +179,12 @@
                     // 获取当前单元格的输入框
                     var input = table.rows[i].cells[j].querySelector("input");
                     // 将解决方案中的值设置到输入框中
-                    if(input.value.length==0 || input.style.color == "red"){
+                    if (input.value.length == 0 || input.style.color == "red") {
                         input.style.color = "red";
-                    }else{
+                    } else {
                         input.style.color = "blue";
                     }
-                    input.value = solution[i*9+j];
+                    input.value = solution[i * 9 + j];
                 }
             }
         });
