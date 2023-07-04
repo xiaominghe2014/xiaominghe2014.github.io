@@ -17,12 +17,12 @@ const smallCubeGeometry = new THREE.BoxGeometry(0.99, 0.99, 0.99);
 // Create an array to hold all the small cube meshes
 const smallCubes = [];
 const smallCubeMaterials = [
-    new THREE.MeshBasicMaterial({ color: 0xffff00, shadowSide: THREE.DoubleSide }), // yellow
-    new THREE.MeshBasicMaterial({ color: 0x0000ff, shadowSide: THREE.DoubleSide }), // blue
     new THREE.MeshBasicMaterial({ color: 0xffffff, shadowSide: THREE.DoubleSide }), // white
-    new THREE.MeshBasicMaterial({ color: 0x00ff00, shadowSide: THREE.DoubleSide }), // green
+    new THREE.MeshBasicMaterial({ color: 0xffff00, shadowSide: THREE.DoubleSide }), // yellow
     new THREE.MeshBasicMaterial({ color: 0xff0000, shadowSide: THREE.DoubleSide }), // red
-    new THREE.MeshBasicMaterial({ color: 0xffa500, shadowSide: THREE.DoubleSide })  // orange
+    new THREE.MeshBasicMaterial({ color: 0xffa500, shadowSide: THREE.DoubleSide }), // orange
+    new THREE.MeshBasicMaterial({ color: 0x0000ff, shadowSide: THREE.DoubleSide }), // blue
+    new THREE.MeshBasicMaterial({ color: 0x00ff00, shadowSide: THREE.DoubleSide }), // green
 ];
 
 
@@ -35,20 +35,20 @@ var groupY = [new THREE.Group(), new THREE.Group(), new THREE.Group()];
 
 
 
-THREE.Outline = function(object) {
+THREE.Outline = function (object) {
 
     var indices = new Uint16Array([0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7]);
     var positions = new Float32Array(8 * 3);
 
     var geometry = new THREE.BufferGeometry();
     geometry.setIndex(new THREE.BufferAttribute(indices, 1));
-    geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
     THREE.LineSegments.call(this, geometry, new THREE.LineBasicMaterial({
-        color: 0x678592,
-        linewidth: 40,
+        color: 0x00,
+        linewidth: 10,
         linecap: 'round',
-        linejoin: 'bevel'
+        // linejoin: 'bevel'
     }));
 
     if (object !== undefined) {
@@ -62,11 +62,11 @@ THREE.Outline = function(object) {
 THREE.Outline.prototype = Object.create(THREE.LineSegments.prototype);
 THREE.Outline.prototype.constructor = THREE.Outline;
 
-THREE.Outline.prototype.update = (function() {
+THREE.Outline.prototype.update = (function () {
 
     var outline = new THREE.Box3();
 
-    return function(object) {
+    return function (object) {
 
         outline.setFromObject(object);
 
@@ -76,19 +76,19 @@ THREE.Outline.prototype.update = (function() {
         var max = outline.max;
 
         /*
-		  5____4
-		1/___0/|
-		| 6__|_7
-		2/___3/
-		0: max.x, max.y, max.z
-		1: min.x, max.y, max.z
-		2: min.x, min.y, max.z
-		3: max.x, min.y, max.z
-		4: max.x, max.y, min.z
-		5: min.x, max.y, min.z
-		6: min.x, min.y, min.z
-		7: max.x, min.y, min.z
-		*/
+          5____4
+        1/___0/|
+        | 6__|_7
+        2/___3/
+        0: max.x, max.y, max.z
+        1: min.x, max.y, max.z
+        2: min.x, min.y, max.z
+        3: max.x, min.y, max.z
+        4: max.x, max.y, min.z
+        5: min.x, max.y, min.z
+        6: min.x, min.y, min.z
+        7: max.x, min.y, min.z
+        */
 
         var position = this.geometry.attributes.position;
         var array = position.array;
@@ -126,6 +126,35 @@ THREE.Outline.prototype.update = (function() {
 
 })();
 
+// object:要添加线条的模型
+// color:线条颜色
+function frameline(object, color) {
+    // 边框辅助线
+    const edges = new THREE.EdgesGeometry(object.geometry)
+    const material = new THREE.LineBasicMaterial({
+        color: color,
+        linewidth: 1,
+        depthWrite: false,
+        depthTest: false,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.05
+    })
+
+    const line = new THREE.LineSegments(edges, material)
+
+    // 获取物体的世界坐标 旋转等
+    const worldPosition = new THREE.Vector3()
+    object.getWorldPosition(worldPosition)
+
+    line.scale.copy(object.scale)
+    line.rotation.copy(object.rotation)
+    line.position.copy(worldPosition)
+
+    return line
+    // return之后，直接添加到场景，或者自建的group/object3D组里即可
+    // group.add(line)
+}
 
 
 // cubeGroup.scale.set(1,1,1)
@@ -204,7 +233,9 @@ function animate() {
     // cubeGroup.remove(groupX[1]);
 }
 
-animate();
+// animate();
+cubeGroup.rotation.x = 0.6;
+cubeGroup.rotation.y = 0.6;
 renderer.render(scene, camera);
 
 
@@ -238,13 +269,15 @@ let rotationAngles = {
     y: 0
 };
 
+let selectedCube = null;
+
 function onMouseDown(event) {
     isDragging = true;
     previousMousePosition = {
         x: event.clientX,
         y: event.clientY
     };
-
+    selectedCube = null;
     //选中哪一层
     cubeGroup.children.forEach((cube) => {
         if (cube.userData.isSelected) {
@@ -260,23 +293,27 @@ function onMouseDown(event) {
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObjects(cubeGroup.children);
     if (intersects.length > 0) {
-        const selectedCube = intersects[0].object;
+        selectedCube = intersects[0].object;
         // Add a selection box to the selected cube
         const selectionBoxGeometry = new THREE.BoxGeometry(1.01, 1.01, 1.01);
-        const selectionBoxMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true, linewidth: 10 });
+        const selectionBoxMaterial = new THREE.LineBasicMaterial({
+            color: 0x000000,
+            linewidth: 10,
+            transparent: true,
+            opacity: 0.2 // Adjust the opacity value as desired
+        });
         const selectionBox = new THREE.Mesh(selectionBoxGeometry, selectionBoxMaterial);
         selectionBox.position.copy(selectedCube.position);
         selectedCube.userData.isSelected = true;
         selectedCube.userData.selectionBox = selectionBox;
         cubeGroup.add(selectionBox);
-
+        console.log(selectedCube.position.x, selectedCube.position.y);
         renderer.render(scene, camera);
     }
 }
 
 function onMouseMove(event) {
     if (!isDragging) return;
-
     const deltaMousePosition = {
         x: event.clientX - previousMousePosition.x,
         y: event.clientY - previousMousePosition.y
@@ -284,6 +321,12 @@ function onMouseMove(event) {
 
     rotationAngles.x += deltaMousePosition.y * 0.01;
     rotationAngles.y += deltaMousePosition.x * 0.01;
+
+
+    if (selectedCube) {
+        //
+        console.log(rotationAngles.x, rotationAngles.y)
+    }
 
     cubeGroup.rotation.x = rotationAngles.x;
     cubeGroup.rotation.y = rotationAngles.y;
@@ -348,7 +391,7 @@ function rotateCube(cube, direction) {
     // }
 }
 
-window.addEventListener('resize', function() {
+window.addEventListener('resize', function () {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
