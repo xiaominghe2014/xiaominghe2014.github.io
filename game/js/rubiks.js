@@ -4,7 +4,7 @@ const scene = new THREE.Scene();
 
 // Create a camera
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 5;
+camera.position.z = 8;
 
 // Create a renderer
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('myCanvas') });
@@ -12,7 +12,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 
 // Create a single small cube geometry
-const smallCubeGeometry = new THREE.BoxGeometry(0.95, 0.95, 0.95);
+const smallCubeGeometry = new THREE.BoxGeometry(0.99, 0.99, 0.99);
 
 // Create an array to hold all the small cube meshes
 const smallCubes = [];
@@ -32,6 +32,102 @@ const smallCubeMaterials = [
 const cubeGroup = new THREE.Group();
 var groupX = [new THREE.Group(), new THREE.Group(), new THREE.Group()];
 var groupY = [new THREE.Group(), new THREE.Group(), new THREE.Group()];
+
+
+
+THREE.Outline = function(object) {
+
+    var indices = new Uint16Array([0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7]);
+    var positions = new Float32Array(8 * 3);
+
+    var geometry = new THREE.BufferGeometry();
+    geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+    geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+    THREE.LineSegments.call(this, geometry, new THREE.LineBasicMaterial({
+        color: 0x678592,
+        linewidth: 40,
+        linecap: 'round',
+        linejoin: 'bevel'
+    }));
+
+    if (object !== undefined) {
+
+        this.update(object);
+
+    }
+
+};
+
+THREE.Outline.prototype = Object.create(THREE.LineSegments.prototype);
+THREE.Outline.prototype.constructor = THREE.Outline;
+
+THREE.Outline.prototype.update = (function() {
+
+    var outline = new THREE.Box3();
+
+    return function(object) {
+
+        outline.setFromObject(object);
+
+        if (outline.empty()) return;
+
+        var min = outline.min;
+        var max = outline.max;
+
+        /*
+		  5____4
+		1/___0/|
+		| 6__|_7
+		2/___3/
+		0: max.x, max.y, max.z
+		1: min.x, max.y, max.z
+		2: min.x, min.y, max.z
+		3: max.x, min.y, max.z
+		4: max.x, max.y, min.z
+		5: min.x, max.y, min.z
+		6: min.x, min.y, min.z
+		7: max.x, min.y, min.z
+		*/
+
+        var position = this.geometry.attributes.position;
+        var array = position.array;
+
+        array[0] = max.x;
+        array[1] = max.y;
+        array[2] = max.z;
+        array[3] = min.x;
+        array[4] = max.y;
+        array[5] = max.z;
+        array[6] = min.x;
+        array[7] = min.y;
+        array[8] = max.z;
+        array[9] = max.x;
+        array[10] = min.y;
+        array[11] = max.z;
+        array[12] = max.x;
+        array[13] = max.y;
+        array[14] = min.z;
+        array[15] = min.x;
+        array[16] = max.y;
+        array[17] = min.z;
+        array[18] = min.x;
+        array[19] = min.y;
+        array[20] = min.z;
+        array[21] = max.x;
+        array[22] = min.y;
+        array[23] = min.z;
+
+        position.needsUpdate = true;
+
+        this.geometry.computeBoundingSphere();
+
+    }
+
+})();
+
+
+
 // cubeGroup.scale.set(1,1,1)
 // Create a cube with different colored faces using small cubes
 for (let x = -1; x <= 1; x++) {
@@ -39,6 +135,8 @@ for (let x = -1; x <= 1; x++) {
 
         for (let z = -1; z <= 1; z++) {
             const smallCube = new THREE.Mesh(smallCubeGeometry, smallCubeMaterials);
+            const boxHelper = new THREE.Outline(smallCube);
+            smallCube.add(boxHelper);
             smallCube.position.set(x, y, z);
             smallCube.receiveShadow = true;
             smallCube.castShadow = true;
@@ -115,7 +213,7 @@ function rotateLayerX(layerIndex, direction) {
 }
 
 function rotateLayerY(layerIndex, direction) {
-    
+
 }
 
 // rotateLayerX(1,'clockwise');
@@ -249,3 +347,10 @@ function rotateCube(cube, direction) {
     //         return;
     // }
 }
+
+window.addEventListener('resize', function() {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.render(scene, camera);
+});
