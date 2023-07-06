@@ -158,6 +158,8 @@ function frameline(object, color) {
 }
 
 let allCubes = [];
+let allX = [[],[],[]];
+let allY = [[],[],[]];
 // cubeGroup.scale.set(1,1,1)
 // Create a cube with different colored faces using small cubes
 for (let x = -1; x <= 1; x++) {
@@ -172,6 +174,8 @@ for (let x = -1; x <= 1; x++) {
             smallCube.castShadow = true;
             groupX[x+1].add(smallCube);
             allCubes.push(smallCube);
+            allX[x+1].push(smallCube);
+            allY[y+1].push(smallCube);
         }
     }
 }
@@ -186,10 +190,52 @@ scene.add(cubeGroup);
 
 let rStart = true;
 
+let rotationXY = 0;
+
 function animate(time) {
     requestAnimationFrame(animate);
     TWEEN.update(time);
+    let rXY = rotationXY%2;
+    let l =  Math.floor(rotationXY/2)%3;
+    if(rXY == 0){
+        //x
+        const layerCubes = getAllCubeX(l-1)
+        const tempGroup = groupX[l];
+        layerCubes.forEach(cube => {
+            changeGroup(cube, tempGroup);
+        });
+        rotateGroup(tempGroup, 'x', 0.02);
+    }else{
+        //y
+        const layerCubes = getAllCubeY(l-1)
+        const tempGroup = groupY[l];
+        layerCubes.forEach(cube => {
+            changeGroup(cube, tempGroup);
+        });
+        rotateGroup(tempGroup, 'y', 0.02);
+    }
+
     renderer.render(scene, camera);
+}
+
+function rotateGroup(group, axis, angle) {
+    if(axis == 'x'){
+        let r = group.rotation.x;
+        if((r+angle)>Math.PI*2){
+            group.rotation.x = 0;
+            rotationXY += 1;
+        }else{
+            group.rotation.x += angle;
+        }
+    }else{
+        let r = group.rotation.y;
+        if((r+angle)>Math.PI*2){
+            group.rotation.y = 0;
+            rotationXY += 1;
+        }else{
+            group.rotation.y += angle;
+        }
+    }
 }
 
 cubeGroup.rotation.x = 0.6;
@@ -200,10 +246,10 @@ function changeGroup(object, newGroup){
     // 创建 object 的深拷贝
     // let objectCopy = Object.assign(Object.create(Object.getPrototypeOf(object)), object);
     // 获取物体在世界中的位置、旋转和缩放
-    const worldPosition = new THREE.Vector3();
-    const worldQuaternion = new THREE.Quaternion();
-    const worldScale = new THREE.Vector3();
-    object.matrixWorld.decompose(worldPosition, worldQuaternion, worldScale);
+    // const worldPosition = new THREE.Vector3();
+    // const worldQuaternion = new THREE.Quaternion();
+    // const worldScale = new THREE.Vector3();
+    // object.matrixWorld.decompose(worldPosition, worldQuaternion, worldScale);
 
     // 将物体从其当前的父级移除
     object.parent.remove(object);
@@ -212,9 +258,9 @@ function changeGroup(object, newGroup){
     newGroup.add(object);
 
     // 设置物体在新组中的位置、旋转和缩放，以保持其在世界中的视角不变
-    object.position.copy(worldPosition);
-    object.quaternion.copy(worldQuaternion);
-    object.scale.copy(worldScale);
+    // object.position.copy(worldPosition);
+    // object.quaternion.copy(worldQuaternion);
+    // object.scale.copy(worldScale);
 }
 
 function getAllCubeX(x){
@@ -376,20 +422,24 @@ function onMouseMove(event) {
     rotationAngles.y += deltaMousePosition.x * 0.01;
 
     
-    let absX = Math.abs(deltaMousePosition.x);
-    let absY = Math.abs(deltaMousePosition.y);
+    // let absX = Math.abs(deltaMousePosition.x);
+    // let absY = Math.abs(deltaMousePosition.y);
 
-    if ((absX>10 || absY>10 ) && selectedCube &&!rotating) {
-        rotating = true;
-        if (Math.abs(rotationAngles.x) > Math.abs(rotationAngles.y)) {
-            rotateLayerX(selectedCube.position.x,rotationAngles.x);
-        } else {
-            rotateLayerY(selectedCube.position.y,rotationAngles.y);
-        }
-    } else {
-        cubeGroup.rotation.x = rotationAngles.x;
-        cubeGroup.rotation.y = rotationAngles.y;
-    }
+    // if ((absX>10 || absY>10 ) && selectedCube &&!rotating) {
+    //     rotating = true;
+    //     if (Math.abs(rotationAngles.x) > Math.abs(rotationAngles.y)) {
+    //         rotateLayerX(selectedCube.position.x,rotationAngles.x);
+    //     } else {
+    //         rotateLayerY(selectedCube.position.y,rotationAngles.y);
+    //     }
+    // } else {
+    //     cubeGroup.rotation.x = rotationAngles.x;
+    //     cubeGroup.rotation.y = rotationAngles.y;
+    // }
+
+    cubeGroup.rotation.x = rotationAngles.x;
+    cubeGroup.rotation.y = rotationAngles.y;
+
     previousMousePosition = {
         x: event.clientX,
         y: event.clientY
