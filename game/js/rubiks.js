@@ -1,4 +1,6 @@
 
+// import * as SceneUtils from 'SceneUtils';
+
 // Create a scene
 const scene = new THREE.Scene();
 
@@ -15,7 +17,6 @@ renderer.shadowMap.enabled = true;
 const smallCubeGeometry = new THREE.BoxGeometry(0.99, 0.99, 0.99);
 
 // Create an array to hold all the small cube meshes
-const smallCubes = [];
 const smallCubeMaterials = [
     new THREE.MeshBasicMaterial({ color: 0xffffff, shadowSide: THREE.DoubleSide }), // white
     new THREE.MeshBasicMaterial({ color: 0xffff00, shadowSide: THREE.DoubleSide }), // yellow
@@ -156,7 +157,7 @@ function frameline(object, color) {
     // group.add(line)
 }
 
-
+let allCubes = [];
 // cubeGroup.scale.set(1,1,1)
 // Create a cube with different colored faces using small cubes
 for (let x = -1; x <= 1; x++) {
@@ -169,87 +170,125 @@ for (let x = -1; x <= 1; x++) {
             smallCube.position.set(x, y, z);
             smallCube.receiveShadow = true;
             smallCube.castShadow = true;
-
-            // Load font
-            // const loader = new THREE.FontLoader();
-            // loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function (font) {
-            //     const textGeometry = new THREE.TextGeometry(`${x},${y},${z}`, {
-            //         font: font,
-            //         size: 0.1,
-            //         height: 0.05,
-            //     });
-            //     const textMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
-            //     const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-            //     textMesh.position.copy(smallCube.position.clone().add(new THREE.Vector3(0, 0, 0)));
-            //     smallCube.add(textMesh);
-            // });
-            cubeGroup.add(smallCube); // Add the small cube to the group
-            // groupX[x + 1].add(smallCube);
-            // groupY[y + 1].add(smallCube);
+            groupX[x+1].add(smallCube);
+            allCubes.push(smallCube);
         }
     }
 }
 
-// for (let i = 0; i < 3; i++) {
-//     cubeGroup.add(groupX[i]);
-//     cubeGroup.add(groupY[i]);
-// }
+for (let i = 0; i < 3; i++) {
+    cubeGroup.add(groupX[i]);
+    cubeGroup.add(groupY[i]);
+}
 
 // Add the cube group to the scene
 scene.add(cubeGroup);
-function animate() {
+
+let rStart = true;
+
+function animate(time) {
     requestAnimationFrame(animate);
-    // const group = new THREE.Group(); // Create a new group
-
-    // Add cubes with x = layerIndex to the group
-    if (groupX[1].children.length == 0) {
-        const layerCubes = cubeGroup.children.filter(cube => cube.position.x === 0);
-        layerCubes.forEach((cube) => {
-            if (cube.position.x === 0) {
-                groupX[1].add(cube);
-            }
-            // console.log(cube.position)
-        });
-
-        // groupX[1].children.forEach((cube) => {
-        //     cubeGroup.remove(cube);
-        // });
-        cubeGroup.add(groupX[1]);
-    }
-
-    // Rotate the group
-    groupX[1].rotation.x += 0.02;
-
-    // Add the group back to the cubeGroup
-    cubeGroup.rotation.x += 0.01;
-    cubeGroup.rotation.y += 0.01;
-    // Render the scene with the camera
+    TWEEN.update(time);
     renderer.render(scene, camera);
-
-    // groupX[1].children.forEach((cube) => {
-    //     groupX[1].remove(cube);
-    //     cubeGroup.add(cube);
-    // });
-    // cubeGroup.remove(groupX[1]);
 }
 
-// animate();
 cubeGroup.rotation.x = 0.6;
 cubeGroup.rotation.y = 0.6;
 renderer.render(scene, camera);
 
+function changeGroup(object, newGroup){
+    // 创建 object 的深拷贝
+    // let objectCopy = Object.assign(Object.create(Object.getPrototypeOf(object)), object);
+    // 获取物体在世界中的位置、旋转和缩放
+    const worldPosition = new THREE.Vector3();
+    const worldQuaternion = new THREE.Quaternion();
+    const worldScale = new THREE.Vector3();
+    object.matrixWorld.decompose(worldPosition, worldQuaternion, worldScale);
 
-function rotateLayerX(layerIndex, direction) {
+    // 将物体从其当前的父级移除
+    object.parent.remove(object);
 
+    // 将物体添加到新的组
+    newGroup.add(object);
+
+    // 设置物体在新组中的位置、旋转和缩放，以保持其在世界中的视角不变
+    object.position.copy(worldPosition);
+    object.quaternion.copy(worldQuaternion);
+    object.scale.copy(worldScale);
 }
 
-function rotateLayerY(layerIndex, direction) {
-
+function getAllCubeX(x){
+    return allCubes.filter(_=>_.position.x == x);
 }
 
+function getAllCubeY(y){
+    return allCubes.filter(_=>_.position.y == y);
+}
+
+// function allCubes(){
+//     return getAllCubeX().concat(getAllCubeY());
+// }
+
+function handlerAngle(angle){
+    if(angle>0 && angle<Math.PI/4){
+        return 0;
+    }
+    if(angle>=Math.PI/4){
+        return Math.PI / 2;
+    }
+    if(angle<=0 && angle>=-Math.PI/4){
+        return 0;
+    }
+    if(angle<=-Math.PI/4){
+        return -Math.PI / 2;
+    }
+}
+
+let rotating = false;
+
+function rotateLayerX(layerIndex, angle) {
+    const layer = groupX[layerIndex+1];
+    const layerCubes = getAllCubeX(layerIndex)
+    layerCubes.forEach(cube => {
+        if(cube.parent!=layer){
+            cube.parent&&cube.parent.remove(cube);
+            layer.add(cube);
+        }
+    });
+   
+    let targetAngle = handlerAngle(angle);
+
+    new TWEEN.Tween(layer.rotation)
+        .to({ x: targetAngle }, 1000) // 1000ms
+        .easing(TWEEN.Easing.Quadratic.Out)
+        .onComplete(() => {rotating = false;})
+        .start();
+}
+
+
+
+function rotateLayerY(layerIndex, angle) {
+    const layer = groupY[layerIndex+1];
+    const layerCubes = getAllCubeY(layerIndex)
+    layerCubes.forEach(cube => {
+        if(cube.parent!=layer){
+            cube.parent&&cube.parent.remove(cube);
+            layer.add(cube);
+        }
+    });
+   
+    let targetAngle = handlerAngle(angle);
+
+    new TWEEN.Tween(layer.rotation)
+        .to({ y: targetAngle }, 1000) // 1000ms
+        .easing(TWEEN.Easing.Quadratic.Out)
+        .onComplete(() => {rotating = false;})
+        .start();
+}
+
+animate();
 // rotateLayerX(1,'clockwise');
 
-// animate();
 
 
 
@@ -258,6 +297,18 @@ const canvas = document.getElementById('myCanvas');
 canvas.addEventListener('mousedown', onMouseDown);
 canvas.addEventListener('mousemove', onMouseMove);
 canvas.addEventListener('mouseup', onMouseUp);
+
+if (navigator.maxTouchPoints > 0) {
+    // Touch device, add touch event listeners
+    canvas.addEventListener('touchstart', onMouseDown);
+    canvas.addEventListener('touchmove', onMouseMove);
+    canvas.addEventListener('touchend', onMouseUp);
+} else {
+    // Computer, add mouse event listeners
+    canvas.addEventListener('mousedown', onMouseDown);
+    canvas.addEventListener('mousemove', onMouseMove);
+    canvas.addEventListener('mouseup', onMouseUp);
+}
 
 let isDragging = false;
 let previousMousePosition = {
@@ -270,6 +321,14 @@ let rotationAngles = {
 };
 
 let selectedCube = null;
+function removeSelect(){
+    if(selectedCube != null){
+        selectedCube.userData.isSelected = false;
+        selectedCube.userData.selectionBox.parent.remove(selectedCube.userData.selectionBox);
+        selectedCube = null;
+        renderer.render(scene, camera);
+    }
+}
 
 function onMouseDown(event) {
     isDragging = true;
@@ -277,21 +336,16 @@ function onMouseDown(event) {
         x: event.clientX,
         y: event.clientY
     };
-    selectedCube = null;
+
     //选中哪一层
-    cubeGroup.children.forEach((cube) => {
-        if (cube.userData.isSelected) {
-            cube.userData.isSelected = false;
-            cubeGroup.remove(cube.userData.selectionBox);
-        }
-    });
-    // Get the cube that was clicked
+    if(rotating) return;
+    removeSelect();
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(cubeGroup.children);
+    const intersects = raycaster.intersectObjects(allCubes);
     if (intersects.length > 0) {
         selectedCube = intersects[0].object;
         // Add a selection box to the selected cube
@@ -306,8 +360,7 @@ function onMouseDown(event) {
         selectionBox.position.copy(selectedCube.position);
         selectedCube.userData.isSelected = true;
         selectedCube.userData.selectionBox = selectionBox;
-        cubeGroup.add(selectionBox);
-        console.log(selectedCube.position.x, selectedCube.position.y);
+        selectedCube.parent.add(selectionBox);
         renderer.render(scene, camera);
     }
 }
@@ -322,15 +375,21 @@ function onMouseMove(event) {
     rotationAngles.x += deltaMousePosition.y * 0.01;
     rotationAngles.y += deltaMousePosition.x * 0.01;
 
-
-    if (selectedCube) {
-        //
-        console.log(rotationAngles.x, rotationAngles.y)
+    
+    let absX = Math.abs(deltaMousePosition.x);
+    let absY = Math.abs(deltaMousePosition.y);
+    
+    if ((absX>10 || absY>10 ) && selectedCube &&!rotating) {
+        rotating = true;
+        if (Math.abs(rotationAngles.x) > Math.abs(rotationAngles.y)) {
+            rotateLayerX(selectedCube.position.x,rotationAngles.x);
+        } else {
+            rotateLayerY(selectedCube.position.y,rotationAngles.y);
+        }
+    } else {
+        cubeGroup.rotation.x = rotationAngles.x;
+        cubeGroup.rotation.y = rotationAngles.y;
     }
-
-    cubeGroup.rotation.x = rotationAngles.x;
-    cubeGroup.rotation.y = rotationAngles.y;
-
     previousMousePosition = {
         x: event.clientX,
         y: event.clientY
@@ -341,54 +400,6 @@ function onMouseMove(event) {
 
 function onMouseUp() {
     isDragging = false;
-}
-
-
-document.addEventListener('keydown', onKeyPress);
-
-function onKeyPress(event) {
-    const selectedCube = cubeGroup.children.find(cube => cube.userData.isSelected);
-
-    if (selectedCube) {
-        switch (event.key) {
-            case 'ArrowUp':
-                rotateCube(selectedCube, 'up');
-                break;
-            case 'ArrowDown':
-                rotateCube(selectedCube, 'down');
-                break;
-            case 'ArrowLeft':
-                rotateCube(selectedCube, 'left');
-                break;
-            case 'ArrowRight':
-                rotateCube(selectedCube, 'right');
-                break;
-        }
-    }
-}
-
-function rotateCube(cube, direction) {
-    // let x = cube.position.x;
-    // let y =cube.position.y;
-    // let dir = 'clockwise';
-    // switch (direction) {
-    //     case 'up':
-    //         dir = 'clockwise';
-    //         rotateLayerY(y,dir);
-    //         return;
-    //     case 'down':
-    //         dir = 'anticlockwise';
-    //         rotateLayerY(y,dir);
-    //         return;
-    //     case 'left':
-    //         dir = 'clockwise';
-    //         rotateLayerX(x,dir);
-    //         return;
-    //     case 'right':
-    //         dir = 'anticlockwise';
-    //         rotateLayerX(x,dir);
-    //         return;
-    // }
 }
 
 window.addEventListener('resize', function () {
