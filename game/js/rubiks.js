@@ -300,9 +300,9 @@ canvas.addEventListener('mouseup', onMouseUp);
 
 if (navigator.maxTouchPoints > 0) {
     // Touch device, add touch event listeners
-    canvas.addEventListener('touchstart', onMouseDown);
-    canvas.addEventListener('touchmove', onMouseMove);
-    canvas.addEventListener('touchend', onMouseUp);
+    // canvas.addEventListener('touchstart', onMouseDown);
+    // canvas.addEventListener('touchmove', onMouseMove);
+    // canvas.addEventListener('touchend', onMouseUp);
 } else {
     // Computer, add mouse event listeners
     canvas.addEventListener('mousedown', onMouseDown);
@@ -378,7 +378,7 @@ function onMouseMove(event) {
     
     let absX = Math.abs(deltaMousePosition.x);
     let absY = Math.abs(deltaMousePosition.y);
-    
+
     if ((absX>10 || absY>10 ) && selectedCube &&!rotating) {
         rotating = true;
         if (Math.abs(rotationAngles.x) > Math.abs(rotationAngles.y)) {
