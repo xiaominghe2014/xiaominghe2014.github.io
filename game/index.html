@@ -3,14 +3,32 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
     <title>小游戏列表</title>
     <style>
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
         body {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
         }
 
         .game-list {
@@ -36,10 +54,107 @@
         .game-list li a:hover {
             background-color: #08bbdf;
         }
+
+        @keyframes bgChange {
+            0% {
+                background-color: tomato;
+            }
+
+            50% {
+                background-color: rgb(240, 122, 18);
+            }
+
+            100% {
+                background-color: tomato;
+            }
+        }
+
+        .heart {
+
+            width: 200px;
+
+            height: 200px;
+
+            background-color:tomato;
+
+            position: relative;
+
+            /* transform: rotate(45deg); */
+
+            animation: heartBlink 20s ease-out infinite;
+
+            z-index: -1;
+        }
+
+        .heart:before,
+
+        .heart:after {
+
+            content: "";
+
+            width: 200px;
+
+            height: 200px;
+
+            background-color: tomato;
+
+            border-radius: 50%;
+
+            position: absolute;
+
+        }
+
+        .heart:before {
+            top: -100px;
+            left: 0;
+        }
+
+
+
+        .heart:after {
+
+            top: 0;
+
+            left: -100px;
+
+        }
+
+        @keyframes heartBlink {
+            0% {
+                /* box-shadow: -1px 0 5px #dbb2b2; */
+                transform: scale(0.1) rotate(45deg);
+                opacity: 0.1;
+            }
+
+            25% {
+                /* box-shadow: -1px 0 6px #dbb2b2; */
+                transform: scale(0.4) rotate(45deg);
+                opacity: 0.6;
+            }
+
+            50% {
+                /* box-shadow: -1px 0 6px #dbb2b2; */
+                transform: scale(0.7) rotate(45deg);
+                opacity: 0.9;
+            }
+
+            75% {
+                /* box-shadow: -1px 0 6px #dbb2b2; */
+                transform: scale(0.4) rotate(45deg);
+                opacity: 0.6;
+            }
+
+            100% {
+                /* box-shadow: -1px 0 5px #dbb2b2; */
+                transform: scale(0.1) rotate(45deg);
+                opacity: 0.1;
+            }
+        }
     </style>
 </head>
 
 <body>
+    <div class="heart"></div>
     <ul class="game-list">
         <li><a href="maze.html">迷宫</a></li>
         <li><a href="flipGame.html">点灯</a></li>
