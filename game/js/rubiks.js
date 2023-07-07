@@ -202,7 +202,7 @@ function animate(time) {
         const layerCubes = getAllCubeX(l-1)
         const tempGroup = groupX[l];
         layerCubes.forEach(cube => {
-            changeGroup(cube, tempGroup);
+            changeCubeGroup(cube, tempGroup);
         });
         rotateGroup(tempGroup, 'x', 0.02);
     }else{
@@ -210,7 +210,7 @@ function animate(time) {
         const layerCubes = getAllCubeY(l-1)
         const tempGroup = groupY[l];
         layerCubes.forEach(cube => {
-            changeGroup(cube, tempGroup);
+            changeCubeGroup(cube, tempGroup);
         });
         rotateGroup(tempGroup, 'y', 0.02);
     }
@@ -242,7 +242,7 @@ cubeGroup.rotation.x = 0.6;
 cubeGroup.rotation.y = 0.6;
 renderer.render(scene, camera);
 
-function changeGroup(object, newGroup){
+function changeCubeGroup(cube, newGroup){
     // 创建 object 的深拷贝
     // let objectCopy = Object.assign(Object.create(Object.getPrototypeOf(object)), object);
     // 获取物体在世界中的位置、旋转和缩放
@@ -252,11 +252,14 @@ function changeGroup(object, newGroup){
     // object.matrixWorld.decompose(worldPosition, worldQuaternion, worldScale);
 
     // 将物体从其当前的父级移除
-    object.parent.remove(object);
-
+    cube.parent.remove(cube);
     // 将物体添加到新的组
-    newGroup.add(object);
-
+    newGroup.add(cube);
+    const box = cube.userData.selectionBox
+    if(box && box.parent){
+        box.parent.remove(box);
+        newGroup.add(box);
+    }
     // 设置物体在新组中的位置、旋转和缩放，以保持其在世界中的视角不变
     // object.position.copy(worldPosition);
     // object.quaternion.copy(worldQuaternion);
@@ -385,7 +388,6 @@ function onMouseDown(event) {
 
     //选中哪一层
     if(rotating) return;
-    removeSelect();
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -393,6 +395,7 @@ function onMouseDown(event) {
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObjects(allCubes);
     if (intersects.length > 0) {
+        removeSelect();
         selectedCube = intersects[0].object;
         // Add a selection box to the selected cube
         const selectionBoxGeometry = new THREE.BoxGeometry(1.01, 1.01, 1.01);
