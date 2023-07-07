@@ -33,6 +33,7 @@ const smallCubeMaterials = [
 const cubeGroup = new THREE.Group();
 var groupX = [new THREE.Group(), new THREE.Group(), new THREE.Group()];
 var groupY = [new THREE.Group(), new THREE.Group(), new THREE.Group()];
+var groupZ = [new THREE.Group(), new THREE.Group(), new THREE.Group()];
 
 
 
@@ -160,6 +161,7 @@ function frameline(object, color) {
 let allCubes = [];
 let allX = [[],[],[]];
 let allY = [[],[],[]];
+let allZ = [[],[],[]];
 // cubeGroup.scale.set(1,1,1)
 // Create a cube with different colored faces using small cubes
 for (let x = -1; x <= 1; x++) {
@@ -172,10 +174,14 @@ for (let x = -1; x <= 1; x++) {
             smallCube.position.set(x, y, z);
             smallCube.receiveShadow = true;
             smallCube.castShadow = true;
+            smallCube.x = x;
+            smallCube.y = y;
+            smallCube.z = z;
             groupX[x+1].add(smallCube);
             allCubes.push(smallCube);
             allX[x+1].push(smallCube);
             allY[y+1].push(smallCube);
+            allZ[z+1].push(smallCube);
         }
     }
 }
@@ -183,6 +189,7 @@ for (let x = -1; x <= 1; x++) {
 for (let i = 0; i < 3; i++) {
     cubeGroup.add(groupX[i]);
     cubeGroup.add(groupY[i]);
+    cubeGroup.add(groupZ[i]);
 }
 
 // Add the cube group to the scene
@@ -195,8 +202,8 @@ let rotationXY = 0;
 function animate(time) {
     requestAnimationFrame(animate);
     TWEEN.update(time);
-    let rXY = rotationXY%2;
-    let l =  Math.floor(rotationXY/2)%3;
+    let rXY = rotationXY%3;
+    let l =  Math.floor(rotationXY/3)%3;
     if(rXY == 0){
         //x
         const layerCubes = getAllCubeX(l-1)
@@ -205,7 +212,7 @@ function animate(time) {
             changeCubeGroup(cube, tempGroup);
         });
         rotateGroup(tempGroup, 'x', 0.02);
-    }else{
+    }else if(rXY == 1){
         //y
         const layerCubes = getAllCubeY(l-1)
         const tempGroup = groupY[l];
@@ -213,6 +220,15 @@ function animate(time) {
             changeCubeGroup(cube, tempGroup);
         });
         rotateGroup(tempGroup, 'y', 0.02);
+    }
+    else if(rXY == 2){
+        //z
+        const layerCubes = getAllCubeZ(l-1)
+        const tempGroup = groupZ[l];
+        layerCubes.forEach(cube => {
+            changeCubeGroup(cube, tempGroup);
+        });
+        rotateGroup(tempGroup, 'z', 0.02);
     }
 
     renderer.render(scene, camera);
@@ -227,13 +243,21 @@ function rotateGroup(group, axis, angle) {
         }else{
             group.rotation.x += angle;
         }
-    }else{
+    }else if(axis == 'y'){
         let r = group.rotation.y;
         if((r+angle)>Math.PI*2){
             group.rotation.y = 0;
             rotationXY += 1;
         }else{
             group.rotation.y += angle;
+        }
+    }else if(axis == 'z'){
+        let r = group.rotation.z;
+        if((r+angle)>Math.PI*2){
+            group.rotation.z = 0;
+            rotationXY += 1;
+        }else{
+            group.rotation.z += angle;
         }
     }
 }
@@ -266,13 +290,64 @@ function changeCubeGroup(cube, newGroup){
     // object.scale.copy(worldScale);
 }
 
+//旋转90度后坐标变化
+function updateOnRote90(cube, axis) {
+    let oldX = cube.x;
+    let oldY = cube.y;
+    let oldZ = cube.z;
+    const rMap = {
+        '-1-1': [1, -1],
+        '0-1': [1, 0],
+        '1-1': [1, 1],
+        '10': [0, 1],
+        '11': [-1, 1],
+        '01': [-1, 0],
+        '-11': [-1, -1],
+        '-10': [0, -1]
+    };
+    switch (axis) {
+        case 'x':
+            //y,z
+            //-1,-1 = > 1,-1
+            //0,-1 = > 1,0
+            //1,-1 => 1,1
+            //1,0 => 0,1
+            //1,1 => -1,1
+            //0,1 => -1,0
+            //-1,1 => -1,-1
+            //-1,0 => 0,-1
+            // cube.y = oldZ;
+            // cube.z = oldY;
+            let k = oldY+""+oldZ;
+            if(rMap[k]){
+                cube.y = rMap[k][0];
+                cube.z = rMap[k][1];
+                console.log(`${oldY},${oldZ}=>${rMap[k]}`)
+            }
+            break;
+        case 'y':
+            cube.x = oldZ;
+            cube.z = oldX;
+            break;
+        case 'z':
+            cube.x = oldY;
+            cube.y = oldX;
+            break;
+    }
+}
+
 function getAllCubeX(x){
-    return allCubes.filter(_=>_.position.x == x);
+    return allCubes.filter(_=>_.x == x);
 }
 
 function getAllCubeY(y){
-    return allCubes.filter(_=>_.position.y == y);
+    return allCubes.filter(_=>_.y == y);
 }
+
+function getAllCubeZ(z){
+    return allCubes.filter(_=>_.z == z);
+}
+
 
 // function allCubes(){
 //     return getAllCubeX().concat(getAllCubeY());
