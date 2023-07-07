@@ -349,14 +349,37 @@ canvas.addEventListener('mouseup', onMouseUp);
 
 if (navigator.maxTouchPoints > 0) {
     // Touch device, add touch event listeners
-    // canvas.addEventListener('touchstart', onMouseDown);
-    // canvas.addEventListener('touchmove', onMouseMove);
-    // canvas.addEventListener('touchend', onMouseUp);
+    canvas.addEventListener('touchstart', onTouchStart);
+    canvas.addEventListener('touchmove', onTouchMove);
+    canvas.addEventListener('touchend', onTouchEnd);
 } else {
     // Computer, add mouse event listeners
     canvas.addEventListener('mousedown', onMouseDown);
     canvas.addEventListener('mousemove', onMouseMove);
     canvas.addEventListener('mouseup', onMouseUp);
+}
+
+function onTouchStart(event) {
+    // Convert touch event to mouse event and call onMouseDown
+    onMouseDown(convertTouchToMouseEvent(event));
+}
+
+function onTouchMove(event) {
+    // Convert touch event to mouse event and call onMouseMove
+    onMouseMove(convertTouchToMouseEvent(event));
+}
+
+function onTouchEnd(event) {
+    // Convert touch event to mouse event and call onMouseUp
+    onMouseUp(convertTouchToMouseEvent(event));
+}
+
+function convertTouchToMouseEvent(touchEvent) {
+    // Convert a touch event into a mouse event
+    return {
+        clientX: touchEvent.touches[0].clientX,
+        clientY: touchEvent.touches[0].clientY
+    };
 }
 
 let isDragging = false;
