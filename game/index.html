@@ -38,21 +38,101 @@
         }
 
         .game-list li {
-            margin-bottom: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+        }
+
+        @keyframes liquidGold {
+            0% {
+                box-shadow: 0 0 3px 2px gold;
+                transform: rotate(0deg);
+            }
+
+            10% {
+                box-shadow: 0 0 4px 3px gold;
+                transform: rotate(36deg);
+            }
+
+            20% {
+                box-shadow: 0 0 5px 4px gold;
+                transform: rotate(72deg);
+            }
+
+            30% {
+                box-shadow: 0 0 6px 5px gold;
+                transform: rotate(108deg);
+            }
+
+            40% {
+                box-shadow: 0 0 5px 6px gold;
+                transform: rotate(144deg);
+            }
+
+            50% {
+                box-shadow: 0 0 4px 7px gold;
+                transform: rotate(180deg);
+            }
+
+            50% {
+                box-shadow: 0 0 6px 8px gold;
+                transform: rotate(216deg);
+            }
+
+            60% {
+                box-shadow: 0 0 8px 6px gold;
+                transform: rotate(252deg);
+            }
+
+            70% {
+                box-shadow: 0 0 7px 5px gold;
+                transform: rotate(288deg);
+            }
+
+            80% {
+                box-shadow: 0 0 6px 4px gold;
+                transform: rotate(324deg);
+            }
+
+            90% {
+                box-shadow: 0 0 5px 3px gold;
+                transform: rotate(360deg);
+            }
+
+            100% {
+                box-shadow: 0 0 0px 0px gold;
+                transform: rotate(360deg);
+            }
+        }
+
+        .liquidGold {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            z-index: -1;
+            animation: liquidGold 8s cubic-bezier(0.47, 0, 0.745, 0.715) infinite;
         }
 
         .game-list li a {
-            display: block;
-            padding: 10px;
-            background-color: #26e2dc;
-            color: #333333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #26e2dc0a;
+            color: #f7eeee;
             text-decoration: none;
             border-radius: 10px;
             transition: background-color 0.2s ease-in-out;
         }
 
         .game-list li a:hover {
-            background-color: #08bbdf;
+            background-color: #08bbdf00;
         }
 
         @keyframes bgChange {
@@ -75,7 +155,7 @@
 
             height: 200px;
 
-            background-color:tomato;
+            background-color: tomato;
 
             position: relative;
 
@@ -156,11 +236,21 @@
 <body>
     <div class="heart"></div>
     <ul class="game-list">
-        <li><a href="maze.html">迷宫</a></li>
-        <li><a href="flipGame.html">点灯</a></li>
-        <li><a href="sokoban.html">推箱子</a></li>
-        <li><a href="sudoku.html">数独</a></li>
-        <li><a href="rubiks.html">魔方</a></li>
+        <li>
+            <div class="liquidGold"></div><a href="maze.html">迷宫</a>
+        </li>
+        <li>
+            <div class="liquidGold"></div><a href="flipGame.html">点灯</a>
+        </li>
+        <li>
+            <div class="liquidGold"></div><a href="sokoban.html">推箱子</a>
+        </li>
+        <li>
+            <div class="liquidGold"></div><a href="sudoku.html">数独</a>
+        </li>
+        <li>
+            <div class="liquidGold"></div><a href="rubiks.html">魔方</a>
+        </li>
     </ul>
 </body>
 
