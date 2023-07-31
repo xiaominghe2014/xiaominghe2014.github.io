@@ -51,8 +51,8 @@ if (!isMobile) {
 
 var scene = new THREE.Scene();
 scene.background = new THREE.Color(0x222222);
-var camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 400);
-camera.position.z = 150;
+var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 8;
 var renderer = new THREE.WebGLRenderer({
   antialias: true
 });

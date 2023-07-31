@@ -58,13 +58,13 @@
     </button>
     <span id="message" class="textCls showOnSolve">Can be solved in N steps</span>
     <span id="current-step" class="textCls showOnSolve">Step #1</span>
-    <div class="colorPallet hideOnSolve">
-        <div id="red" class="active" onclick="activateColor(this.id,0)"></div>
-        <div id="green" onclick="activateColor(this.id,1)"></div>
-        <div id="blue" onclick="activateColor(this.id,2)"></div>
-        <div id="yellow" onclick="activateColor(this.id,3)"></div>
-        <div id="orange" onclick="activateColor(this.id,4)"></div>
-        <div id="white" onclick="activateColor(this.id,5)"></div>
+    <div class="colorPallet hideOnSolve" style="display: block;">
+        <div id="red" class="active" onclick="activateColor(this.id,0)" ontouchstart="activateColor(this.id,0)"></div>
+        <div id="green" onclick="activateColor(this.id,1)" ontouchstart="activateColor(this.id,1)"></div>
+        <div id="blue" onclick="activateColor(this.id,2)" ontouchstart="activateColor(this.id,2)"></div>
+        <div id="yellow" onclick="activateColor(this.id,3)" ontouchstart="activateColor(this.id,3)"></div>
+        <div id="orange" onclick="activateColor(this.id,4)" ontouchstart="activateColor(this.id,4)"></div>
+        <div id="white" onclick="activateColor(this.id,5)" ontouchstart="activateColor(this.id,5)"></div>
     </div>
 </body>
 
