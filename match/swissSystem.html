@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>瑞士积分编排示例</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="js/swissSys.js"></script>
+    <style>
+    </style>
+</head>
+
+<body>
+    <h1>瑞士积分编排</h1>
+
+    <!-- 第一轮编排列表 -->
+    <h2>编排列表</h2>
+    <div id="against">
+    </div>
+    <!-- 下一轮编排 -->
+    <h2>下一轮编排</h2>
+    <form id="nextRoundForm">
+        <!-- 输入参赛人数 -->
+        <label for="participantCount">参赛人数：</label>
+        <input type="number" id="participantCount" min="2" name="participantCount">
+        <br>
+        <button type="submit">生成下一轮编排</button>
+        <!-- 清除按钮 -->
+        <button type="button" id="clearButton">清除列表数据</button>
+    </form>
+    <h5>备注:本示例采用平局的1分，胜得2分，负不得分展示</h5>
+    <script>
+
+        // 下一轮是第几轮
+        var nextRound = 1;
+        // 所有轮次信息
+        var rotationArr = [];
+        // 自动生成编排列表的代码
+        $(document).ready(function () {
+            // 监听清除按钮的点击事件
+            $('#clearButton').click(function () {
+                // 清空编排列表和轮次信息
+                $('#against').empty();
+                rotationArr = [];
+                nextRound = 1;
+            });
+            // 监听表单提交事件
+            $('#nextRoundForm').submit(function (event) {
+                event.preventDefault();
+                // 获取参赛人数
+                var participantCount = parseInt($('#participantCount').val());
+                // 自动生成第N轮编排列表
+                console.log(participantCount)
+                let r = SwissSys.layoutNext(rotationArr, participantCount);
+                console.log(r)
+                rotationArr.push(r);
+                $('#against').append('<h3>第' + r.round + '轮</h3>');
+                let ulId = 'round' + r.round;
+                $('#against').append('<ul id=' + ulId + '></ul>');
+                let ul = '#' + ulId;
+                let idx = 1;
+                for (let against of r.againsts) {
+                    against.first.scores += 1;
+                    if (!against.bye) {
+                        against.second.scores += 1;
+                    }
+                    against.result = 'draw'
+                    let firstName = "选手" + against.first.serialNumber;
+                    let secondName = against.bye ? "轮空" : "选手" + against.second.serialNumber;
+                    let vsStr = '<span>' + firstName + `(积分${against.first.scores})` + ' VS ' + (against.bye ? "" : `(积分${against.second.scores})`) + secondName + '</span>';
+                    vsStr += ' <select id="result_' + r.round + '_' + idx + '">';
+                    vsStr += '<option value="draw">平局</option>';
+                    vsStr += '<option value="win_first">先胜</option>';
+                    vsStr += '<option value="win_second">先负</option>';
+                    vsStr += '</select>';
+                    $(ul).append('<li id=' + r.round + "_" + idx + '>' + vsStr + '</li>');
+                    idx++;
+                }
+                // 监听对局结果的更改
+                $(ul).on('change', 'select', function () {
+                    // 获取所选的对局结果
+                    let result = $(this).val();
+                    // 获取对局的ID
+                    let id = $(this).closest('li').attr('id');
+                    // 在控制台打印对局ID和结果
+                    console.log('对局ID:', id);
+                    console.log('对局结果:', result);
+                    // 获取轮次信息对象
+                    let roundId = id.split('_')[0];
+                    let roundInfo = rotationArr[roundId - 1];
+
+                    // 获取修改前的对局结果
+                    var i = id.split('_')[1];
+                    let against = roundInfo.againsts[i - 1]
+                    let previousResult = against.result;
+                    if (previousResult != result) {
+                        against.result = result;
+                        console.log('修改前的对局结果:', previousResult);
+                        if (result == 'win_first') {
+                            if (previousResult == 'draw') {
+                                r.againsts[i - 1].first.scores += 1;
+                                if (!r.againsts[i - 1].bye) {
+                                    r.againsts[i - 1].second.scores -= 1;
+                                }
+                            }
+                            if (previousResult == 'win_second') {
+                                r.againsts[i - 1].first.scores += 2;
+                                if (!r.againsts[i - 1].bye) {
+                                    r.againsts[i - 1].second.scores -= 2;
+                                }
+                            }
+                        }
+                        if (result == 'win_second') {
+                            if (previousResult == 'draw') {
+                                r.againsts[i - 1].first.scores -= 1;
+                                if (!r.againsts[i - 1].bye) {
+                                    r.againsts[i - 1].second.scores += 1;
+                                }
+                            }
+                            if (previousResult == 'win_first') {
+                                r.againsts[i - 1].first.scores -= 2;
+                                if (!r.againsts[i - 1].bye) {
+                                    r.againsts[i - 1].second.scores += 2;
+                                }
+                            }
+                        }
+                        if (result == 'draw') {
+                            if (previousResult == 'win_first') {
+                                r.againsts[i - 1].first.scores -= 1;
+                                if (!r.againsts[i - 1].bye) {
+                                    r.againsts[i - 1].second.scores += 1;
+                                }
+                            }
+                            if (previousResult == 'win_second') {
+                                r.againsts[i - 1].first.scores += 1;
+                                if (!r.againsts[i - 1].bye) {
+                                    r.againsts[i - 1].second.scores -= 1;
+                                }
+                            }
+                        }
+                        let li = $(this).closest('li');
+                        let vsStrElement = li.find('span');
+                        let firstName = "选手" + against.first.serialNumber;
+                        let secondName = against.bye ? "轮空" : "选手" + against.second.serialNumber;
+                        vsStr = firstName + `(积分${against.first.scores})` + ' VS ' + (against.bye ? "" : `(积分${against.second.scores})`) + secondName;
+                        vsStrElement.text(vsStr);
+                    }
+                });
+                nextRound += 1;
+            });
+        });
+    </script>
+</body>
+
+</html>
