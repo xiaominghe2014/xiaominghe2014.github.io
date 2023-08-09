@@ -13,7 +13,7 @@
 </head>
 
 <body>
-    <h1>瑞士积分编排</h1>
+    <h1>瑞士积分编排示例</h1>
 
     <!-- 第一轮编排列表 -->
     <h2>编排列表</h2>
@@ -52,9 +52,9 @@
                 // 获取参赛人数
                 var participantCount = parseInt($('#participantCount').val());
                 // 自动生成第N轮编排列表
-                console.log(participantCount)
+                // console.log(participantCount)
                 let r = SwissSys.layoutNext(rotationArr, participantCount);
-                console.log(r)
+                // console.log(r)
                 rotationArr.push(r);
                 $('#against').append('<h3>第' + r.round + '轮</h3>');
                 let ulId = 'round' + r.round;
@@ -67,9 +67,10 @@
                         against.second.scores += 1;
                     }
                     against.result = 'draw'
+                    let strTai = `第${idx}台    `;
                     let firstName = "选手" + against.first.serialNumber;
                     let secondName = against.bye ? "轮空" : "选手" + against.second.serialNumber;
-                    let vsStr = '<span>' + firstName + `(积分${against.first.scores})` + ' VS ' + (against.bye ? "" : `(积分${against.second.scores})`) + secondName + '</span>';
+                    let vsStr = '<span>' + strTai + firstName + `(积分${against.first.scores})` + ' VS ' + secondName + (against.bye ? "" : `(积分${against.second.scores})`) + '</span>';
                     vsStr += ' <select id="result_' + r.round + '_' + idx + '">';
                     vsStr += '<option value="draw">平局</option>';
                     vsStr += '<option value="win_first">先胜</option>';
@@ -85,8 +86,8 @@
                     // 获取对局的ID
                     let id = $(this).closest('li').attr('id');
                     // 在控制台打印对局ID和结果
-                    console.log('对局ID:', id);
-                    console.log('对局结果:', result);
+                    // console.log('对局ID:', id);
+                    // console.log('对局结果:', result);
                     // 获取轮次信息对象
                     let roundId = id.split('_')[0];
                     let roundInfo = rotationArr[roundId - 1];
@@ -97,7 +98,7 @@
                     let previousResult = against.result;
                     if (previousResult != result) {
                         against.result = result;
-                        console.log('修改前的对局结果:', previousResult);
+                        // console.log('修改前的对局结果:', previousResult);
                         if (result == 'win_first') {
                             if (previousResult == 'draw') {
                                 r.againsts[i - 1].first.scores += 1;
@@ -140,11 +141,12 @@
                                 }
                             }
                         }
+                        let strTai = `第${i}台    `;
                         let li = $(this).closest('li');
                         let vsStrElement = li.find('span');
                         let firstName = "选手" + against.first.serialNumber;
                         let secondName = against.bye ? "轮空" : "选手" + against.second.serialNumber;
-                        vsStr = firstName + `(积分${against.first.scores})` + ' VS ' + (against.bye ? "" : `(积分${against.second.scores})`) + secondName;
+                        vsStr = strTai + firstName + `(积分${against.first.scores})` + ' VS ' + secondName+(against.bye ? "" : `(积分${against.second.scores})`);
                         vsStrElement.text(vsStr);
                     }
                 });
