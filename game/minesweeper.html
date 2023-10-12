@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        #board {
+            display: flex;
+            flex-wrap: wrap;
+            width: 200px;
+            /* 10个20px宽的cell */
+        }
+        
+        .bomb,
+        .mine,
+        .safe,
+        .hidden {
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            line-height: 20px;
+            font-size: 14px;
+        }
+
+        .bomb{
+            background-color:darkred ;
+        }
+
+        .mine {
+            background-color: red;
+            box-shadow: inset 0 0 2px rgba(0, 0, 0);
+            /* 添加内阴影 */
+        }
+
+        .safe {
+            background-color: gray;
+            box-shadow: inset 0 0 2px rgba(0, 0, 0);
+            /* 添加内阴影 */
+        }
+
+        .hidden {
+            background-color: rgb(89, 87, 87);
+            box-shadow: 0 0 10px rgb(160, 156, 156);
+            /* 添加内阴影 */
+        }
+
+        .count-1 {
+            color: blue;
+        }
+
+        .count-2 {
+            color: green;
+        }
+
+        .count-3 {
+            color: red;
+        }
+
+        .count-4 {
+            color: rgb(0, 0, 128);
+        }
+
+        .count-5 {
+            color: maroon;
+        }
+
+        .count-6 {
+            color: turquoise;
+        }
+
+        .count-7 {
+            color: black;
+        }
+
+        .count-8 {
+            color: gray;
+        }
+    </style>
+    <script>
+        var board = [];
+        var size = 10;
+        var mineCount = 25;
+
+        function generateBoard() {
+            for (var i = 0; i < size; i++) {
+                board[i] = [];
+                for (var j = 0; j < size; j++) {
+                    board[i][j] = { mine: false, revealed: false };
+                }
+            }
+
+            for (var i = 0; i < mineCount; i++) {
+                var x = Math.floor(Math.random() * size);
+                var y = Math.floor(Math.random() * size);
+                board[x][y].mine = true;
+            }
+        }
+
+        function countMines(x, y) {
+            var count = 0;
+            for (var dx = -1; dx <= 1; dx++) {
+                for (var dy = -1; dy <= 1; dy++) {
+                    var nx = x + dx;
+                    var ny = y + dy;
+                    if (nx >= 0 && nx < size && ny >= 0 && ny < size && board[nx][ny].mine) {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }
+
+
+        function reveal(x, y) {
+            if (board[x][y].revealed) {
+                return;
+            }
+
+            board[x][y].revealed = true;
+            var cell = document.getElementById(x + "-" + y);
+            if (board[x][y].mine) {
+                cell.className = "bomb";
+                //翻开所有格子
+                // for (var i = 0; i < size; i++) {
+                //     for (var j = 0; j < size; j++) {
+                //         if (!board[i][j].revealed) {
+                //             board[i][j].revealed = true;
+                //             if(board[i][k].mine){
+                //                 cell.className = "mine";
+                //             }else{
+                //                 var count = countMines(i, j);
+                //                 if (count > 0) {
+                //                     cell.textContent = count.toString();
+                //                     cell.textContent = count.toString();
+                //                     cell.className = "safe count-" + count;
+                //                 } else {
+                //                     cell.className = "safe";
+                //                 }
+                //             }
+                //         }
+                //     }
+                // }
+                setTimeout(function () {
+                    if (window.confirm("你点到了雷，游戏结束。点击确定重新开始。")) {
+                        startGame();
+                    }
+                }, 1);
+            } else {
+                var count = countMines(x, y);
+                if (count > 0) {
+                    cell.textContent = count.toString();
+                    cell.textContent = count.toString();
+                    cell.className = "safe count-" + count;
+                } else {
+                    cell.className = "safe";
+                }
+                var allRevealed = true;
+                for (var i = 0; i < size; i++) {
+                    for (var j = 0; j < size; j++) {
+                        if (!board[i][j].revealed && !board[i][j].mine) {
+                            allRevealed = false;
+                            break;
+                        }
+                    }
+                    if (!allRevealed) {
+                        break;
+                    }
+                }
+                if (allRevealed) {
+                    setTimeout(function () {
+                        if (window.confirm("恭喜你，你赢了！点击确定再来一局。")) {
+                            startGame();
+                        }
+                    }, 100);
+                }
+            }
+        }
+
+
+        function createBoardElement() {
+            var boardElement = document.getElementById("board");
+            boardElement.innerHTML = "";
+            for (var i = 0; i < size; i++) {
+                for (var j = 0; j < size; j++) {
+                    var cell = document.createElement("div");
+                    cell.id = i + "-" + j;
+                    cell.className = "hidden";
+                    cell.onclick = (function (x, y) {
+                        return function () {
+                            reveal(x, y);
+                        };
+                    })(i, j);
+                    boardElement.appendChild(cell);
+                }
+            }
+        }
+
+        function startGame() {
+            generateBoard();
+            createBoardElement();
+        }
+    </script>
+</head>
+
+<body onload="startGame()">
+    <div id="board"></div>
+</body>
+
+</html>
