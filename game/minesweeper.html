@@ -178,7 +178,6 @@
                             var count = countMines(i, j);
                             if (count > 0) {
                                 cell.textContent = count.toString();
-                                cell.textContent = count.toString();
                                 cell.className = "safe count-" + count;
                             } else {
                                 cell.className = "safe";
@@ -200,7 +199,6 @@
                             var count = countMines(nx, ny);
                             var cell = document.getElementById(nx + "-" + ny);
                             if (count > 0) {
-                                cell.textContent = count.toString();
                                 cell.textContent = count.toString();
                                 cell.className = "safe count-" + count;
                             } else {
@@ -234,7 +232,6 @@
             } else {
                 var count = countMines(x, y);
                 if (count > 0) {
-                    cell.textContent = count.toString();
                     cell.textContent = count.toString();
                     cell.className = "safe count-" + count;
                 } else {
