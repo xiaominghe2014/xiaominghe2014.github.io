@@ -85,6 +85,14 @@
             width: 50%;
             /* 设置宽度为父元素宽度的一半 */
         }
+        .restart_button {
+            background-image: url('img/refresh_reload_icon.svg');
+            background-size: 48px;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 150px;
+            height: 72px;
+        }
     </style>
     <script>
         var board = [];
@@ -106,12 +114,12 @@
         }
 
         function generateBoard() {
-            let mineArr = createArray(size*size,mineCount)
+            let mineArr = createArray(size * size, mineCount)
             mineArr = shuffleArray(mineArr);
             for (var i = 0; i < size; i++) {
                 board[i] = [];
                 for (var j = 0; j < size; j++) {
-                    board[i][j] = { mine: mineArr[j+i*size], revealed: false };
+                    board[i][j] = { mine: mineArr[j + i * size], revealed: false };
                 }
             }
         }
@@ -130,6 +138,28 @@
             return count;
         }
 
+        function flipAllCell() {
+            for (var i = 0; i < size; i++) {
+                for (var j = 0; j < size; j++) {
+                    if (!board[i][j].revealed) {
+                        board[i][j].revealed = true;
+                        var cell = document.getElementById(i + "-" + j);
+                        if (board[i][j].mine) {
+                            cell.className = "mine";
+                        } else {
+                            var count = countMines(i, j);
+                            if (count > 0) {
+                                cell.textContent = count.toString();
+                                cell.textContent = count.toString();
+                                cell.className = "safe count-" + count;
+                            } else {
+                                cell.className = "safe";
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         function reveal(x, y) {
             if (board[x][y].revealed) {
@@ -141,30 +171,12 @@
             if (board[x][y].mine) {
                 cell.className = "bomb";
                 //翻开所有格子
-                // for (var i = 0; i < size; i++) {
-                //     for (var j = 0; j < size; j++) {
-                //         if (!board[i][j].revealed) {
-                //             board[i][j].revealed = true;
-                //             if(board[i][k].mine){
-                //                 cell.className = "mine";
-                //             }else{
-                //                 var count = countMines(i, j);
-                //                 if (count > 0) {
-                //                     cell.textContent = count.toString();
-                //                     cell.textContent = count.toString();
-                //                     cell.className = "safe count-" + count;
-                //                 } else {
-                //                     cell.className = "safe";
-                //                 }
-                //             }
-                //         }
-                //     }
-                // }
+                flipAllCell();
                 setTimeout(function () {
                     if (window.confirm("你点到了雷，游戏结束。点击确定重新开始。")) {
                         startGame();
                     }
-                }, 1);
+                }, 0);
             } else {
                 var count = countMines(x, y);
                 if (count > 0) {
@@ -219,6 +231,7 @@
             generateBoard();
             createBoardElement();
         }
+
     </script>
 </head>
 
@@ -226,6 +239,10 @@
     <div id="board" class="center-div"></div>
     <div class="center-div">
         <h3><a href="index.html">更多小游戏</a></h3>
+    </div>
+    <div class="center-div">
+        <button id="restart" onclick="startGame()">重新开始</button>
+        <button id="cat" onclick="flipAllCell()">查看</button>
     </div>
 </body>
 
