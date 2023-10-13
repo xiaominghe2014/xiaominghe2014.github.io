@@ -2,11 +2,13 @@
 <html>
 
 <head>
+    <meta charset="UTF-8"><meta/>
+    <title>扫雷</title>
     <style>
         #board {
             display: flex;
             flex-wrap: wrap;
-            width: 200px;
+            width: 400px;
             /* 10个20px宽的cell */
         }
         
@@ -14,11 +16,12 @@
         .mine,
         .safe,
         .hidden {
-            width: 20px;
-            height: 20px;
+            width: 40px;
+            height: 40px;
             text-align: center;
-            line-height: 20px;
-            font-size: 14px;
+            line-height: 40px;
+            font-size: 20px;
+            font-weight: bolder;
         }
 
         .bomb{
@@ -73,6 +76,12 @@
 
         .count-8 {
             color: gray;
+        }
+        .center-div {
+            margin: 0 auto;
+            /* 水平居中 */
+            width: 50%;
+            /* 设置宽度为父元素宽度的一半 */
         }
     </style>
     <script>
@@ -202,7 +211,10 @@
 </head>
 
 <body onload="startGame()">
-    <div id="board"></div>
+    <div id="board" class="center-div"></div>
+    <div class="center-div">
+        <h3><a href="index.html">更多小游戏</a></h3>
+    </div>
 </body>
 
 </html>
