@@ -161,6 +161,30 @@
             }
         }
 
+        function flipSafe(x,y){
+            for (var dx = -1; dx <= 1; dx++) {
+                for (var dy = -1; dy <= 1; dy++) {
+                    var nx = x + dx;
+                    var ny = y + dy;
+                    if (nx >= 0 && nx < size && ny >= 0 && ny < size) {
+                        if(!board[nx][ny].revealed){
+                            board[nx][ny].revealed = true;
+                            var count = countMines(nx, ny);
+                            var cell = document.getElementById(nx + "-" + ny);
+                            if (count > 0) {
+                                cell.textContent = count.toString();
+                                cell.textContent = count.toString();
+                                cell.className = "safe count-" + count;
+                            } else {
+                                cell.className = "safe";
+                                flipSafe(nx,ny);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         function reveal(x, y) {
             if (board[x][y].revealed) {
                 return;
@@ -185,6 +209,7 @@
                     cell.className = "safe count-" + count;
                 } else {
                     cell.className = "safe";
+                    flipSafe(x,y);
                 }
                 var allRevealed = true;
                 for (var i = 0; i < size; i++) {
