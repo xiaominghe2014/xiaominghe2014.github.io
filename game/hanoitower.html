@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>汉诺塔</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    ul {
+        list-style: none
+    }
+
+    .nav {
+        width: 900px;
+        height: 50px;
+        border: 1px solid black;
+        margin: 0px auto;
+        margin-top: 100px
+    }
+
+    .nav .w {
+
+        margin: 8px auto
+    }
+
+    .nav .w .txt {
+        margin-left: 300px;
+        width: 200px;
+        height: 30px;
+        text-indent: 10px
+    }
+
+    .nav .w .btn,
+    .nav .w .start,
+    .nav .w .stop {
+        width: 50px;
+        height: 30px;
+    }
+
+    .box {
+        width: 900px;
+        height: 600px;
+        margin: 0px auto;
+        border: 1px solid black
+    }
+
+    .box .left,
+    .box .middle,
+    .box .right {
+        float: left;
+        width: 298px;
+        height: 100%;
+        position: relative;
+        /* border: 1px solid black */
+    }
+
+    .box .zhuzi {
+        width: 18px;
+        height: 378px;
+        margin: 0px auto;
+        margin-top: 200px;
+        border: 1px solid black
+    }
+
+    .box .bottom {
+        width: 80%;
+        height: 18px;
+        margin: 0 auto;
+        border: 1px solid black
+    }
+
+    .box .panzi {
+        position: absolute;
+        width: 100%;
+        /* height: 80px; */
+        /* background-color: skyblue; */
+        bottom: 20px;
+        left: 0px
+    }
+
+    .box .panzi li {
+        /* width: 20px; */
+        position: relative;
+        /*height: 30px;*/
+        /*background-color: black; */
+        margin: 0 auto;
+        border-radius: 10px;
+        color:#FFF;
+        text-align: center;
+    }
+
+    
+</style>
+
+<body>
+    <div class="nav">
+        <div class="w">
+            <input type="text" placeholder="请输入数字" class="txt" id="txt">
+            <input type="button" value="确定" class="btn" id="btn">
+            <input type="button" value="开始" class="start" id="start">
+            <select name="speed" id="speed"  >
+                <option value="500"> 正常 </option>
+                <option value="1000"> 慢</option>
+                <option value="300"> 快</option>
+             </select>
+            <!--input type="button" value="暂停" class="btn" id="pause"-->
+            <!-- <input type="button" value="停止" class="stop" id="stop"> -->
+        </div>
+    </div>
+    <div class="box">
+        <div class="left">
+            <div class="zhuzi"></div>
+            <div class="bottom"></div>
+            <ul class="panzi" id="position1">
+            </ul>
+        </div>
+        <div class="middle">
+            <div class="zhuzi"></div>
+            <div class="bottom"></div>
+            <ul class="panzi" id="position2"></ul>
+        </div>
+        <div class="right">
+            <div class="zhuzi"></div>
+            <div class="bottom"></div>
+            <ul class="panzi" id="position3"></ul>
+        </div>
+    </div>
+</body>
+<script>
+    var statusPause = false;
+    var animateSpeed=500;
+    $(function () {
+        var arr = [];
+        var height = 30;
+        //点击确认过后创建盘子
+        $('#btn').click(function () {
+            var txt = $('#txt').val();//获取创建盘子的个数
+            var width = 0;//初始盘子的宽度
+            var step = 30;//每加一个盘子增加的宽度
+            // console.log(txt);
+            $('#position1').children().remove();
+            $('#position2').children().remove();
+            $('#position3').children().remove();
+            arr = [];
+            //创建盘子
+            for (var i = 0; i < txt; i++) {
+                let showI= i+1;
+                var newLi = $('<li >'+showI+'</li>');
+                width = width + step;
+                newLi.css('width', width);
+                newLi.css('height', height);
+                let colorFloat=roundColorFloat();
+                newLi.css('background-color', getBackgound(colorFloat));
+                newLi.css('color', getFontColor(colorFloat));
+                newLi.appendTo($('#position1'))
+            }
+            height = $('#position1').children().eq(0).height();
+            // console.log(height)
+        });
+        $('#start').click(function () {
+            var position1 = 'position1';
+            var position2 = 'position2';
+            var position3 = 'position3';
+            var txt = $('#txt').val();//获取创建盘子的个数
+            hanoi(txt, position1, position2, position3);
+            // console.log(arr);
+            //归位
+            reToposition1();
+            var i = 0;
+            // var timeId = null;
+            moveAnimate(arr[0]);
+            function hanoi(txt, position1, position2, position3) {
+                var pan_num = txt;
+                if (pan_num == 1) {
+                    move(position1, position3);
+                } else {
+                    hanoi(pan_num - 1, position1, position3, position2);
+                    move(position1, position3);
+                    hanoi(pan_num - 1, position2, position1, position3);
+                }
+            }
+
+            function hanoiSetTimeout(txt, position1, position2, position3) {
+                
+                if(statusPause){
+                    
+                    setTimeout(function(){
+                        hanoiSetTimeoutDo(txt, position1, position2, position3);
+                    },2000);
+                }else{
+                    hanoiSetTimeoutDo(txt, position1, position2, position3);
+                }
+            }
+
+            function hanoiSetTimeoutDo(txt, position1, position2, position3) {
+                console.log("hanoiSetTimeoutDo:"+txt+","+position1+","+position2+","+position3);
+                var pan_num = txt;
+                if (pan_num == 1) {
+                    moveSetTimeout(position1, position3);
+                } else {
+                    hanoiSetTimeout(pan_num - 1, position1, position3, position2);
+                    moveSetTimeout(position1, position3);
+                    hanoiSetTimeout(pan_num - 1, position2, position1, position3);
+                }
+            }
+
+            function moveSetTimeout(position1, position3) {
+                console.log("moveSetTimeout:"+position1+","+position3);
+                if(statusPause){
+                    setTimeout(function(){
+                        move(position1, position3);
+                    },2000);
+                }else{
+                    move(position1, position3);
+                }
+            }
+
+            function move(position1, position3) {
+                var boxWidth = $('#position1').width();
+                // console.log('haha')
+                positionFirst = position1;
+                positionLast = position3;
+                // console.log(positionFirst + positionLast)
+                //向上移动的距离
+                var step1 = 400;
+                //水平移动的距离
+                var step2 = (positionLast[positionLast.length - 1] - positionFirst[positionFirst.length - 1]) * boxWidth;
+                positionFirst = '#' + positionFirst;
+                positionLast = '#' + positionLast;
+                var step3 = height * $(positionLast).children().length;
+                // console.log(positionFirst + positionLast + step1 + " " + step2 + " " + step3);
+                //将所有的步骤都放到对象里
+                var obj = new Object();
+                obj.positionFirst = positionFirst;
+                obj.positionLast = positionLast;
+                obj.step1 = step1;
+                obj.step2 = step2;
+                obj.step3 = step3;
+                //依次将对象推入数组中
+                // console.log(obj);
+                arr.push(obj);
+                if ($(obj.positionLast).children().eq(0).length == 0) {
+                    $(obj.positionFirst).children().eq(0).appendTo($(obj.positionLast));
+                } else {
+                    $(obj.positionFirst).children().eq(0).insertBefore($(obj.positionLast).children().eq(0));
+                }
+            }
+            //实现动画效果
+            function moveAnimate(obj) {
+                if (obj == undefined) {
+                    return
+                }
+                $(obj.positionFirst).children().eq(0).animate({
+                    'bottom': obj.step1
+                }, animateSpeed, function () {
+                    $(obj.positionFirst).children().eq(0).animate({
+                        'left': obj.step2
+                    }, animateSpeed, function () {
+                        $(obj.positionFirst).children().eq(0).animate({
+                            'bottom': obj.step3
+                        }, animateSpeed, function () {
+                            if ($(obj.positionLast).children().eq(0).length == 0) {
+                                $(obj.positionFirst).children().eq(0).css({
+                                    'bottom': 0,
+                                    'left': 0
+                                })
+                                $(obj.positionFirst).children().eq(0).appendTo($(obj.positionLast));
+                            } else {
+                                $(obj.positionFirst).children().eq(0).css({
+                                    'bottom': 0,
+                                    'left': 0
+                                })
+                                $(obj.positionFirst).children().eq(0).insertBefore($(obj.positionLast).children().eq(0));
+                            }
+                            i++;
+                            moveAnimate(arr[i])
+                        })
+                    })
+                });
+            }
+            function reToposition1() {
+                $('#position3').children().appendTo($('#position1'));
+            }
+        });
+
+        $('#pause').click(function () {
+            if(!statusPause){
+                statusPause=true;
+                $('#pause').val("取消暂停");
+            }else{
+                statusPause=false;
+                $('#pause').val("暂停");
+            }
+            
+        });
+
+        $('#speed').change(function(){
+            
+                animateSpeed = parseInt( $('#speed option:selected').val());
+        });
+
+
+    })
+
+    function roundColorFloat(){
+        return Math.random()*(2<<23);
+        
+    }
+    function getBackgound(colorFloat){
+        console.log(colorFloat);
+        console.log('#'+Math.floor(colorFloat).toString(16));
+        
+        let colorStr1= Math.floor(colorFloat).toString(16);
+        for(let i = colorStr1.length ; i < 6;i++){
+            colorStr1 = '0'+colorStr1;
+        }
+
+        return '#'+colorStr1;
+    }
+
+    function getFontColor(colorFloat){
+        if(colorFloat>8400000){
+            return "#000";
+        }else{
+            return "#FFF";
+        }
+    }
+
+
+    
+
+</script>
+
+</html>
