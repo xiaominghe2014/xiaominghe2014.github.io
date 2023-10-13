@@ -85,6 +85,7 @@
             width: 50%;
             /* 设置宽度为父元素宽度的一半 */
         }
+
         .restart_button {
             background-image: url('img/refresh_reload_icon.svg');
             background-size: 48px;
@@ -92,6 +93,32 @@
             background-position: center;
             width: 150px;
             height: 72px;
+        }
+
+        @keyframes explode {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            25% {
+                transform: rotate(10deg);
+            }
+
+            50% {
+                transform: rotate(-10deg);
+            }
+
+            75% {
+                transform: rotate(10deg);
+            }
+
+            100% {
+                transform: rotate(0deg);
+            }
+        }
+
+        .bomb.explode {
+            animation: explode 0.5s;
         }
     </style>
     <script>
@@ -146,6 +173,7 @@
                         var cell = document.getElementById(i + "-" + j);
                         if (board[i][j].mine) {
                             cell.className = "mine";
+                            cell.textContent = "☠️";
                         } else {
                             var count = countMines(i, j);
                             if (count > 0) {
@@ -161,13 +189,13 @@
             }
         }
 
-        function flipSafe(x,y){
+        function flipSafe(x, y) {
             for (var dx = -1; dx <= 1; dx++) {
                 for (var dy = -1; dy <= 1; dy++) {
                     var nx = x + dx;
                     var ny = y + dy;
                     if (nx >= 0 && nx < size && ny >= 0 && ny < size) {
-                        if(!board[nx][ny].revealed){
+                        if (!board[nx][ny].revealed) {
                             board[nx][ny].revealed = true;
                             var count = countMines(nx, ny);
                             var cell = document.getElementById(nx + "-" + ny);
@@ -177,7 +205,7 @@
                                 cell.className = "safe count-" + count;
                             } else {
                                 cell.className = "safe";
-                                flipSafe(nx,ny);
+                                flipSafe(nx, ny);
                             }
                         }
                     }
@@ -193,8 +221,9 @@
             board[x][y].revealed = true;
             var cell = document.getElementById(x + "-" + y);
             if (board[x][y].mine) {
-                cell.textContent = "X";
-                cell.className = "bomb count-7";
+                cell.textContent = "💥";
+                cell.className = "bomb";
+                cell.classList.add("explode"); // 添加爆炸动画类名
                 //翻开所有格子
                 flipAllCell();
                 setTimeout(function () {
@@ -210,7 +239,7 @@
                     cell.className = "safe count-" + count;
                 } else {
                     cell.className = "safe";
-                    flipSafe(x,y);
+                    flipSafe(x, y);
                 }
                 var allRevealed = true;
                 for (var i = 0; i < size; i++) {
