@@ -193,7 +193,8 @@
             board[x][y].revealed = true;
             var cell = document.getElementById(x + "-" + y);
             if (board[x][y].mine) {
-                cell.className = "bomb";
+                cell.textContent = "X";
+                cell.className = "bomb count-7";
                 //翻开所有格子
                 flipAllCell();
                 setTimeout(function () {
