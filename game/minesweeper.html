@@ -2,7 +2,8 @@
 <html>
 
 <head>
-    <meta charset="UTF-8"><meta/>
+    <meta charset="UTF-8">
+    <meta />
     <title>扫雷</title>
     <style>
         #board {
@@ -11,7 +12,7 @@
             width: 400px;
             /* 10个20px宽的cell */
         }
-        
+
         .bomb,
         .mine,
         .safe,
@@ -24,8 +25,8 @@
             font-weight: bolder;
         }
 
-        .bomb{
-            background-color:darkred ;
+        .bomb {
+            background-color: darkred;
         }
 
         .mine {
@@ -77,6 +78,7 @@
         .count-8 {
             color: gray;
         }
+
         .center-div {
             margin: 0 auto;
             /* 水平居中 */
@@ -89,18 +91,28 @@
         var size = 10;
         var mineCount = 25;
 
+        function createArray(length, n) {
+            var array = new Array(length).fill(false);
+            array.fill(true, 0, n);
+            return array;
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
         function generateBoard() {
+            let mineArr = createArray(size*size,mineCount)
+            mineArr = shuffleArray(mineArr);
             for (var i = 0; i < size; i++) {
                 board[i] = [];
                 for (var j = 0; j < size; j++) {
-                    board[i][j] = { mine: false, revealed: false };
+                    board[i][j] = { mine: mineArr[j+i*size], revealed: false };
                 }
-            }
-
-            for (var i = 0; i < mineCount; i++) {
-                var x = Math.floor(Math.random() * size);
-                var y = Math.floor(Math.random() * size);
-                board[x][y].mine = true;
             }
         }
 
