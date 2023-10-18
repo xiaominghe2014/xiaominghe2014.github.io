@@ -27,6 +27,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            pointer-events: none;
         }
 
         .zhuzi span {
@@ -49,30 +50,66 @@
 <body>
     <h1>Hanoi Tower Game</h1>
 
-    <div class="tower" id="tower1">
+    <div class="tower" id="tower1" ondragover="allowDrop(event)" ondrop="drop(event)">
         <div class="zhuzi">
             <span>A</span>
         </div>
-        <div class="disk" style="width: 20px; margin-top: 200px;"></div>
-        <div class="disk" style="width: 40px;"></div>
-        <div class="disk" style="width: 60px;"></div>
-        <div class="disk" style="width: 80px;"></div>
-        <div class="disk" style="width: 100px;"></div>
+        <div id="d1" class="disk" style="width: 20px; margin-top: 200px;" draggable="true" ondragstart="drag(event)">
+        </div>
+        <div id="d2" class="disk" style="width: 40px;" draggable="true" ondragstart="drag(event)"></div>
+        <div id="d3" class="disk" style="width: 60px;" draggable="true" ondragstart="drag(event)"></div>
+        <div id="d4" class="disk" style="width: 80px;" draggable="true" ondragstart="drag(event)"></div>
+        <div id="d5" class="disk" style="width: 100px;" draggable="true" ondragstart="drag(event)"></div>
     </div>
 
-    <div class="tower" id="tower2">
+    <div class="tower" id="tower2" ondragover="allowDrop(event)" ondrop="drop(event)">
         <div class="zhuzi">
             <span>B</span>
         </div>
     </div>
 
-    <div class="tower" id="tower3">
+    <div class="tower" id="tower3" ondragover="allowDrop(event)" ondrop="drop(event)">
         <div class="zhuzi">
             <span>C</span>
         </div>
     </div>
 
     <script>
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            var data = ev.dataTransfer.getData("text");
+            ev.target.appendChild(document.getElementById(data));
+        }
+        var disks = document.querySelectorAll('.disk');
+        for (var i = 0; i < disks.length; i++) {
+            disks[i].addEventListener('click', function () {
+
+                var currentTower = this.parentNode;
+                var currentTowerId = currentTower.id;
+                var otherTowers = document.querySelectorAll('.tower:not(#' + currentTowerId + ')');
+                for (var i = 0; i < otherTowers.length; i++) {
+                    var otherTower = otherTowers[i];
+                    var otherTowerId = otherTower.id;
+                    var zhuzi = otherTower.firstElementChild;
+                    // if (!topDisk || parseInt(topDisk.style.width) > parseInt(this.style.width)) {
+                    //     otherTower.style.backgroundColor = 'lightgreen';
+                    // } else {
+                    //     otherTower.style.backgroundColor = 'red';
+                    // }
+                    zhuzi.style.backgroundColor = 'lightgreen';
+                }
+
+            });
+        }
         function moveDisk(source, destination) {
             var sourceTower = document.getElementById(source);
             var destinationTower = document.getElementById(destination);
