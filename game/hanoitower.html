@@ -87,8 +87,12 @@
         function drop(ev) {
             ev.preventDefault();
             var data = ev.dataTransfer.getData("text");
-            ev.target.appendChild(document.getElementById(data));
+            var disk = document.getElementById(data);
+            var oldMarginTop = window.getComputedStyle(disk).marginTop;
+            ev.target.appendChild(disk);
+            disk.style.marginTop = oldMarginTop;
         }
+        
         var disks = document.querySelectorAll('.disk');
         for (var i = 0; i < disks.length; i++) {
             disks[i].addEventListener('click', function () {
@@ -105,7 +109,7 @@
                     // } else {
                     //     otherTower.style.backgroundColor = 'red';
                     // }
-                    zhuzi.style.backgroundColor = 'lightgreen';
+                    // zhuzi.style.backgroundColor = 'lightgreen';
                 }
 
             });
