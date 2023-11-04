@@ -91,7 +91,7 @@
         </div>
     </div>
     <script>
-        var lightSize = 5;
+        var lightSize = 1;
         var numRows = lightSize;
         var numCols = lightSize;
 
@@ -147,6 +147,7 @@
             let success = checkWin(gameBoard)
             if (success) {
                 // $('#win-modal').modal('show');
+                resetBoard(lightSize+1);
             }
         }
 
@@ -162,13 +163,17 @@
             table.removeEventListener('click', boardClick);
         }
 
-        const resetBoard = function () {
+        const resetInputBoard = function () {
             let tmp = parseInt(prompt("Enter new board size:"));
 
             if (isNaN(tmp) || tmp < 1) {
                 alert("输入数据不对");
                 return;
             }
+            resetBoard(tmp);
+        }
+
+        const resetBoard = function (tmp) {
             lightSize = tmp;
             numRows = lightSize;
             numCols = lightSize;
@@ -204,7 +209,7 @@
 
         initBoard();
         addBoardEventListener();
-        document.getElementById('reset-button').addEventListener('click', resetBoard);
+        document.getElementById('reset-button').addEventListener('click', resetInputBoard);
 
         const addMarker = function () {
             tip = solveFlip()
