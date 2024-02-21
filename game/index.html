@@ -26,7 +26,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background: linear-gradient(-45deg, #237fd5, #23d5ab);
             background-size: 400% 400%;
             animation: gradient 15s ease infinite;
         }
@@ -47,68 +47,6 @@
             border-radius: 50%;
         }
 
-        @keyframes liquidGold {
-            0% {
-                box-shadow: 0 0 3px 2px gold;
-                transform: rotate(0deg);
-            }
-
-            10% {
-                box-shadow: 0 0 4px 3px gold;
-                transform: rotate(36deg);
-            }
-
-            20% {
-                box-shadow: 0 0 5px 4px gold;
-                transform: rotate(72deg);
-            }
-
-            30% {
-                box-shadow: 0 0 6px 5px gold;
-                transform: rotate(108deg);
-            }
-
-            40% {
-                box-shadow: 0 0 5px 6px gold;
-                transform: rotate(144deg);
-            }
-
-            50% {
-                box-shadow: 0 0 4px 7px gold;
-                transform: rotate(180deg);
-            }
-
-            50% {
-                box-shadow: 0 0 6px 8px gold;
-                transform: rotate(216deg);
-            }
-
-            60% {
-                box-shadow: 0 0 8px 6px gold;
-                transform: rotate(252deg);
-            }
-
-            70% {
-                box-shadow: 0 0 7px 5px gold;
-                transform: rotate(288deg);
-            }
-
-            80% {
-                box-shadow: 0 0 6px 4px gold;
-                transform: rotate(324deg);
-            }
-
-            90% {
-                box-shadow: 0 0 5px 3px gold;
-                transform: rotate(360deg);
-            }
-
-            100% {
-                box-shadow: 0 0 0px 0px gold;
-                transform: rotate(360deg);
-            }
-        }
-
         .liquidGold {
             position: absolute;
             top: 0;
@@ -117,7 +55,27 @@
             height: 100%;
             border-radius: 50%;
             z-index: -1;
-            animation: liquidGold 8s cubic-bezier(0.47, 0, 0.745, 0.715) infinite;
+            animation: liquidGold 2.5s infinite;
+        }
+
+        @keyframes liquidGold {
+
+            0%,
+            100% {
+                box-shadow: 0 0 3px 2px gold;
+            }
+
+            25% {
+                box-shadow: 0 3px 3px 2px gold;
+            }
+
+            50% {
+                box-shadow: 3px 0 3px 2px gold;
+            }
+
+            75% {
+                box-shadow: 0 -3px 3px 2px gold;
+            }
         }
 
         .game-list li a {
@@ -202,31 +160,31 @@
         @keyframes heartBlink {
             0% {
                 /* box-shadow: -1px 0 5px #dbb2b2; */
-                transform: scale(0.1) rotate(45deg);
+                transform: scale(0.05) rotate(45deg);
                 opacity: 0.1;
             }
 
             25% {
                 /* box-shadow: -1px 0 6px #dbb2b2; */
-                transform: scale(0.4) rotate(45deg);
-                opacity: 0.6;
+                transform: scale(0.1) rotate(45deg);
+                opacity: 0.2;
             }
 
             50% {
                 /* box-shadow: -1px 0 6px #dbb2b2; */
-                transform: scale(0.7) rotate(45deg);
-                opacity: 0.9;
+                transform: scale(0.15) rotate(45deg);
+                opacity: 0.3;
             }
 
             75% {
                 /* box-shadow: -1px 0 6px #dbb2b2; */
-                transform: scale(0.4) rotate(45deg);
-                opacity: 0.6;
+                transform: scale(0.1) rotate(45deg);
+                opacity: 0.2;
             }
 
             100% {
                 /* box-shadow: -1px 0 5px #dbb2b2; */
-                transform: scale(0.1) rotate(45deg);
+                transform: scale(0.05) rotate(45deg);
                 opacity: 0.1;
             }
         }
@@ -234,7 +192,7 @@
 </head>
 
 <body>
-    <div class="heart"></div>
+    <!-- <div class="heart"></div> -->
     <ul class="game-list">
         <li>
             <div class="liquidGold"></div><a href="maze.html">迷宫</a>
@@ -256,5 +214,27 @@
         </li>
     </ul>
 </body>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const numberOfHearts = Math.floor(Math.random() * 5) + 20; // 心形数量
+
+        for (let i = 0; i < numberOfHearts; i++) {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            // 随机位置
+            heart.style.position = 'absolute';
+            heart.style.left = `${Math.random() * 100}%`;
+            heart.style.top = `${Math.random() * 100}%`;
+
+            // 防止心形部分超出页面
+            heart.style.transform = 'translate(-50%, -50%)';
+            // 为每个心形添加随机动画延迟
+            const animationDelay = i%5; // 随机延迟，最多5秒
+            heart.style.animationDelay = `${animationDelay}s`;
+            heart.style.opacity = 0;
+            document.body.appendChild(heart);
+        }
+    });
+</script>
 
 </html>
