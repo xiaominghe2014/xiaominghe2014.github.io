@@ -213,13 +213,6 @@
 
         const addMarker = function () {
             tip = solveFlip()
-
-            for (let i = 0; i < numRows; i++) {
-                for (let j = 0; j < numCols; j++) {
-                    gameBoard[i][j] = 0;
-                }
-            }
-            renderGameBoard(gameBoard);
             renderTip();
         }
 
@@ -337,8 +330,7 @@
                     }
                 }
             }
-
-            let status = new Array(r).fill(1);
+            let status = Array.from({ length: r }, (_, i) => 1-gameBoard[Math.floor(i / lightSize)][i % lightSize]);
             let result = new Array(r).fill(0);
             let canceled = new Array(r).fill(false);
             let freeArg = [];
