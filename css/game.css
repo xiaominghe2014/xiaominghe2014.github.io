@@ -6,13 +6,6 @@ body {
   background: #f7f7fd;
 }
 
-body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: black;
-}
 
 :root {
   --grey-color: #7f8c8d;
