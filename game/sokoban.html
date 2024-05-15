@@ -121,7 +121,7 @@
             background-size: 40px;
             background-repeat: no-repeat;
             background-position: center;
-            animation: gif 1s;
+            /* animation: gif 1s; */
             /* 使图片填充整个元素 */
             position: absolute;
             top: 0;
@@ -416,6 +416,14 @@
     <script src="js/sokoban.js"></script>
     <!-- <script src="js/gif.js"></script> -->
     <script type="text/javascript">
+
+        const babyImgs = {
+            up:"img/baby_up.png",
+            down:"img/baby_down.png",
+            left:"img/baby_left.png",
+            right:"img/baby_right.png"
+        };
+
         const cellW = 50;
         var level = 0;
         var map = [
@@ -792,9 +800,30 @@
                 movePlayer("right");
             });
         }
+        
+        function loadImage(srcs,callback){
+			var count = 0,imgNum = 0,images = {};
 
-        init();
-        addKeyListener();
+			for(src in srcs){
+				imgNum++;
+			}
+			for(src in srcs ){
+				images[src] = new Image();
+				images[src].onload = function(){
+					//判断是否所有的图片都预加载完成
+					if (++count >= imgNum)
+					{
+						callback(images);
+					}
+				}
+				images[src].src = srcs[src];
+			}
+		}
+
+        loadImage(babyImgs,()=>{
+            init();
+            addKeyListener();
+        });
 
     </script>
 </body>
