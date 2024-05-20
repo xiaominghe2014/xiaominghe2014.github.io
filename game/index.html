@@ -1,58 +1,170 @@
 ﻿<!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>好玩的小游戏</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>好玩的小游戏</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<link rel='stylesheet' href='../css/aqua.min.css'>
-<link rel="stylesheet" href="../css/game.css">
-<link rel="stylesheet" href="../css/dog.css">
-
+  <link rel='stylesheet' href='../css/aqua.min.css'>
+  <link rel="stylesheet" href="../css/game.css">
+  <link rel="stylesheet" href="../css/dog.css">
+  <style>
+    #bg-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -2000;
+      pointer-events: none;
+    }
+  </style>
 </head>
+
 <body>
 
-<ul class="menu-hover-fill flex flex-col items-start leading-none text-2xl uppercase space-y-4">
-  <li><a href="maze.html"" data-text="迷宫">迷宫</a></li>
-  <li><a href="flipGame.html" data-text="点灯">点灯</a></li>
-  <li><a href="sokoban.html" data-text="推箱子">推箱子</a></li>
-  <li><a href="sudoku.html" data-text="数独">数独</a></li>
-  <li><a href="rubiks.html" data-text="魔方">魔方</a></li>
-  <li><a href="minesweeper.html" data-text="扫雷">扫雷</a></li>
-</ul>
-<div class="main">
-  <div class="dog">
-    <div class="dog__paws">
-      <div class="dog__bl-leg leg">
-        <div class="dog__bl-paw paw"></div>
-        <div class="dog__bl-top top"></div>
-      </div>
-      <div class="dog__fl-leg leg">
-        <div class="dog__fl-paw paw"></div>
-        <div class="dog__fl-top top"></div>
-      </div>
-      <div class="dog__fr-leg leg">
-        <div class="dog__fr-paw paw"></div>
-        <div class="dog__fr-top top"></div>
-      </div>
-    </div>
-    <div class="dog__body">
-      <div class="dog__tail"></div>
-    </div>
-    <div class="dog__head">
-      <div class="dog__snout">
-        <div class="dog__nose"></div>
-        <div class="dog__eyes">
-          <div class="dog__eye-l"></div>
-          <div class="dog__eye-r"></div>
+  <ul class="menu-hover-fill flex flex-col items-start leading-none text-2xl uppercase space-y-4">
+    <li><a href="maze.html"" data-text=" 迷宫">迷宫</a></li>
+    <li><a href="flipGame.html" data-text="点灯">点灯</a></li>
+    <li><a href="sokoban.html" data-text="推箱子">推箱子</a></li>
+    <li><a href="sudoku.html" data-text="数独">数独</a></li>
+    <li><a href="rubiks.html" data-text="魔方">魔方</a></li>
+    <li><a href="minesweeper.html" data-text="扫雷">扫雷</a></li>
+  </ul>
+  <div class="main">
+    <div class="dog">
+      <div class="dog__paws">
+        <div class="dog__bl-leg leg">
+          <div class="dog__bl-paw paw"></div>
+          <div class="dog__bl-top top"></div>
+        </div>
+        <div class="dog__fl-leg leg">
+          <div class="dog__fl-paw paw"></div>
+          <div class="dog__fl-top top"></div>
+        </div>
+        <div class="dog__fr-leg leg">
+          <div class="dog__fr-paw paw"></div>
+          <div class="dog__fr-top top"></div>
         </div>
       </div>
-    </div>
-    <div class="dog__head-c">
-      <div class="dog__ear-l"></div>
-      <div class="dog__ear-r"></div>
+      <div class="dog__body">
+        <div class="dog__tail"></div>
+      </div>
+      <div class="dog__head">
+        <div class="dog__snout">
+          <div class="dog__nose"></div>
+          <div class="dog__eyes">
+            <div class="dog__eye-l"></div>
+            <div class="dog__eye-r"></div>
+          </div>
+        </div>
+      </div>
+      <div class="dog__head-c">
+        <div class="dog__ear-l"></div>
+        <div class="dog__ear-r"></div>
+      </div>
     </div>
   </div>
-</div>
+  <canvas id="bg-canvas"></canvas>
+  <script>
+    var canvas = document.getElementById('bg-canvas'),
+      ctx = canvas.getContext('2d'),
+      w = canvas.width = window.innerWidth,
+      h = canvas.height = window.innerHeight,
+
+      hue = 217,
+      stars = [],
+      count = 0,
+      maxStars = 1200;
+
+    var canvas2 = document.createElement('canvas'),
+      ctx2 = canvas2.getContext('2d');
+    canvas2.width = 100;
+    canvas2.height = 100;
+    var half = canvas2.width / 2,
+      gradient2 = ctx2.createRadialGradient(half, half, 0, half, half, half);
+    gradient2.addColorStop(0.025, '#fff');
+    gradient2.addColorStop(0.1, 'hsl(' + hue + ', 61%, 33%)');
+    gradient2.addColorStop(0.25, 'hsl(' + hue + ', 64%, 6%)');
+    gradient2.addColorStop(1, 'transparent');
+
+    ctx2.fillStyle = gradient2;
+    ctx2.beginPath();
+    ctx2.arc(half, half, half, 0, Math.PI * 2);
+    ctx2.fill();
+
+    // End cache
+
+    function random(min, max) {
+      if (arguments.length < 2) {
+        max = min;
+        min = 0;
+      }
+
+      if (min > max) {
+        var hold = max;
+        max = min;
+        min = hold;
+      }
+
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function maxOrbit(x, y) {
+      var max = Math.max(x, y),
+        diameter = Math.round(Math.sqrt(max * max + max * max));
+      return diameter / 2;
+    }
+
+    var Star = function () {
+
+      this.orbitRadius = random(maxOrbit(w, h));
+      this.radius = random(60, this.orbitRadius) / 12;
+      this.orbitX = w / 2;
+      this.orbitY = h / 2;
+      this.timePassed = random(0, maxStars);
+      this.speed = random(this.orbitRadius) / 900000;
+      this.alpha = random(2, 10) / 10;
+
+      count++;
+      stars[count] = this;
+    }
+
+    Star.prototype.draw = function () {
+      var x = Math.sin(this.timePassed) * this.orbitRadius + this.orbitX,
+        y = Math.cos(this.timePassed) * this.orbitRadius + this.orbitY,
+        twinkle = random(10);
+
+      if (twinkle === 1 && this.alpha > 0) {
+        this.alpha -= 0.05;
+      } else if (twinkle === 2 && this.alpha < 1) {
+        this.alpha += 0.05;
+      }
+
+      ctx.globalAlpha = this.alpha;
+      ctx.drawImage(canvas2, x - this.radius / 2, y - this.radius / 2, this.radius, this.radius);
+      this.timePassed += this.speed;
+    }
+
+    for (var i = 0; i < maxStars; i++) {
+      new Star();
+    }
+
+    function animation() {
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = 0.8;
+      ctx.fillStyle = 'hsla(' + hue + ', 64%, 6%, 1)';
+      ctx.fillRect(0, 0, w, h)
+
+      ctx.globalCompositeOperation = 'lighter';
+      for (var i = 1, l = stars.length; i < l; i++) {
+        stars[i].draw();
+      };
+
+      window.requestAnimationFrame(animation);
+    }
+
+    animation();
+  </script>
 </body>
+
 </html>
