@@ -1,0 +1,93 @@
+<!-- game/go.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>围棋棋盘</title>
+    <style>
+        #boardCanvas {
+            margin: 0 auto;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="boardCanvas"></canvas>
+    <!-- <button id="clearBoard">清空棋盘</button>
+    <button id="switchToBlack">切换黑棋</button>
+    <button id="switchToWhite">切换白棋</button> -->
+
+    <script>
+
+        const xArr = "ABCDEFGHJKLMNOPQRST";
+
+        let canvas = document.getElementById('boardCanvas');
+        let ctx = canvas.getContext('2d');
+        let w = window.innerWidth > window.innerHeight ? window.innerHeight : window.innerWidth;
+        canvas.width = w;
+        canvas.height = w;
+        ctx.fillStyle = 'lightyellow';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        let cellW = w / 20;
+        let cellH = w / 20;
+        // 绘制棋盘线
+        ctx.strokeStyle = 'black';
+        for (let i = 1; i <= 19; i++) {
+            ctx.beginPath();
+            ctx.moveTo(cellW * i, cellH);
+            ctx.lineTo(cellW * i, w - cellH);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(cellW, cellH * i);
+            ctx.lineTo(w - cellW, cellH * i);
+            ctx.stroke();
+
+            ctx.font = "12px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "black";
+            ctx.fillText(xArr[i - 1], cellW * i, w - cellH / 2 + 6);
+            ctx.fillText(xArr[i - 1], cellW * i, cellH / 2 - 6);
+
+            ctx.fillText(i, w - cellW / 2 + 6, cellH * i);
+            ctx.fillText(i, cellW / 2 - 6, cellH * i);
+        }
+
+        let isBlack = true;
+        canvas.addEventListener('click', function (event) {
+            let x = event.offsetX;
+            let y = event.offsetY;
+
+            let col = Math.floor(x / cellW);
+            let row = Math.floor(y / cellH);
+            if(col<1 || col>19) return;
+            if(row<1 || row>19) return;
+            let diffX = cellW*col - x;
+            let diffY = cellH*row - y;
+            if(diffX>cellW*0.6 || diffX< -cellW*0.6) return;
+            if(diffY>cellH*0.6 || diffY< -cellH*0.6) return;
+
+            if (isBlack) {
+                ctx.fillStyle = 'black';
+                ctx.beginPath();
+                ctx.arc(col * cellW, row * cellH , cellW / 2 - 4, 0, 2 * Math.PI);
+                ctx.fill();
+            } else {
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                ctx.arc(col * cellW , row * cellH , cellW / 2 - 4, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+
+            isBlack = !isBlack;
+        });
+
+    </script>
+</body>
+
+</html>
