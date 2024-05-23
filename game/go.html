@@ -23,6 +23,11 @@
 
     <script>
 
+        const emptyPos = 0;
+        const blackStone = 1;
+        const whiteStone = 2;
+        const boardSize = 19; 
+
         const xArr = "ABCDEFGHJKLMNOPQRST";
 
         let canvas = document.getElementById('boardCanvas');
@@ -36,7 +41,7 @@
         let cellH = w / 20;
         // 绘制棋盘线
         ctx.strokeStyle = 'black';
-        for (let i = 1; i <= 19; i++) {
+        for (let i = 1; i <= boardSize; i++) {
             ctx.beginPath();
             ctx.moveTo(cellW * i, cellH);
             ctx.lineTo(cellW * i, w - cellH);
@@ -58,30 +63,38 @@
             ctx.fillText(i, cellW / 2 - 6, cellH * i);
         }
 
+
+
+        const board = Array.from({ length: boardSize }, () => Array(boardSize).fill(emptyPos));
+
         let isBlack = true;
         canvas.addEventListener('click', function (event) {
             let x = event.offsetX;
             let y = event.offsetY;
 
-            let col = Math.floor(x / cellW);
-            let row = Math.floor(y / cellH);
-            if(col<1 || col>19) return;
-            if(row<1 || row>19) return;
-            let diffX = cellW*col - x;
-            let diffY = cellH*row - y;
-            if(diffX>cellW*0.6 || diffX< -cellW*0.6) return;
-            if(diffY>cellH*0.6 || diffY< -cellH*0.6) return;
-
+            let col = Math.round(x / cellW);
+            let row = Math.round(y / cellH);
+            if(col<1 || col>boardSize) return;
+            if(row<1 || row>boardSize) return;
+            //此处有子不能下
+            if(board[row-1][col-1]!=emptyPos) return;
+            // let diffX = cellW*col - x;
+            // let diffY = cellH*row - y;
+            // if(diffX>cellW*0.6 || diffX< -cellW*0.6) return;
+            // if(diffY>cellH*0.6 || diffY< -cellH*0.6) return;
+            
             if (isBlack) {
                 ctx.fillStyle = 'black';
                 ctx.beginPath();
                 ctx.arc(col * cellW, row * cellH , cellW / 2 - 4, 0, 2 * Math.PI);
                 ctx.fill();
+                board[row-1][col-1] = blackStone;
             } else {
-                ctx.fillStyle = 'white';
+                ctx.fillStyle = '#f0f0f0'; // Light gray;
                 ctx.beginPath();
                 ctx.arc(col * cellW , row * cellH , cellW / 2 - 4, 0, 2 * Math.PI);
                 ctx.fill();
+                board[row-1][col-1] = whiteStone;
             }
 
             isBlack = !isBlack;
