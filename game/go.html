@@ -16,17 +16,29 @@
 </head>
 
 <body>
+    <script src="js/gobard.js"></script>
+    <div style="text-align: center;">
+        <button id="clearBoard">清空棋盘</button>
+        <button id="undoMove">悔棋</button>
+    </div>
     <canvas id="boardCanvas"></canvas>
     <!-- <button id="clearBoard">清空棋盘</button>
     <button id="switchToBlack">切换黑棋</button>
     <button id="switchToWhite">切换白棋</button> -->
 
     <script>
-
-        const emptyPos = 0;
-        const blackStone = 1;
-        const whiteStone = 2;
         const boardSize = 19;
+        //绘制棋盘星位小圆点
+        const starPoints = [
+            [4, 4], [10, 4], [16, 4],
+            [4, 10], [10, 10], [16, 10],
+            [4, 16], [10, 16], [16, 16]
+        ];
+
+
+        const board = Array(boardSize*boardSize).fill(go.EMPTY);
+
+        let goBoard = new go.Board(board,boardSize);
 
         const xArr = "ABCDEFGHJKLMNOPQRST";
 
@@ -35,52 +47,102 @@
         let w = window.innerWidth > window.innerHeight ? window.innerHeight : window.innerWidth;
         canvas.width = w;
         canvas.height = w;
-        ctx.fillStyle = 'lightyellow';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
         let cellW = w / 20;
         let cellH = w / 20;
-        // 绘制棋盘线
-        ctx.strokeStyle = 'black';
-        for (let i = 1; i <= boardSize; i++) {
-            ctx.beginPath();
-            ctx.moveTo(cellW * i, cellH);
-            ctx.lineTo(cellW * i, w - cellH);
-            ctx.stroke();
 
-            ctx.beginPath();
-            ctx.moveTo(cellW, cellH * i);
-            ctx.lineTo(w - cellW, cellH * i);
-            ctx.stroke();
+        function drawBoard() {
+            ctx.fillStyle = 'lightyellow';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.font = "12px Arial";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillStyle = "black";
-            ctx.fillText(xArr[i - 1], cellW * i, w - cellH / 2 + 6);
-            ctx.fillText(xArr[i - 1], cellW * i, cellH / 2 - 6);
+            // 绘制棋盘线
+            ctx.strokeStyle = 'black';
+            for (let i = 1; i <= boardSize; i++) {
+                ctx.beginPath();
+                ctx.moveTo(cellW * i, cellH);
+                ctx.lineTo(cellW * i, w - cellH);
+                ctx.stroke();
 
-            ctx.fillText(i, w - cellW / 2 + 6, cellH * i);
-            ctx.fillText(i, cellW / 2 - 6, cellH * i);
+                ctx.beginPath();
+                ctx.moveTo(cellW, cellH * i);
+                ctx.lineTo(w - cellW, cellH * i);
+                ctx.stroke();
+
+                ctx.font = "12px Arial";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillStyle = "black";
+                ctx.fillText(xArr[i - 1], cellW * i, w - cellH / 2 + 6);
+                ctx.fillText(xArr[i - 1], cellW * i, cellH / 2 - 6);
+
+                ctx.fillText(i, w - cellW / 2 + 6, cellH * i);
+                ctx.fillText(i, cellW / 2 - 6, cellH * i);
+            }
         }
 
-        //绘制棋盘星位小圆点
-        const starPoints = [
-            [4, 4], [10, 4], [16, 4],
-            [4, 10], [10, 10], [16, 10],
-            [4, 16], [10, 16], [16, 16]
-        ];
 
-        ctx.fillStyle = 'black';
-        for (let i = 0; i < starPoints.length; i++) {
-            let [starX, starY] = starPoints[i];
+        function drawStar() {
+            ctx.fillStyle = 'black';
+            for (let i = 0; i < starPoints.length; i++) {
+                let [starX, starY] = starPoints[i];
+                ctx.beginPath();
+                ctx.arc(starX * cellW, starY * cellH, 3, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+        }
+
+        function drawPiece(row, col, color) {
+            if (color == go.EMPTY) return;
+            let fillStyle = color == go.BLACK ? 'black' : 'lavender';
+            ctx.fillStyle = fillStyle;
             ctx.beginPath();
-            ctx.arc(starX * cellW, starY * cellH, 3, 0, 2 * Math.PI);
+            ctx.arc(col * cellW, row * cellH, cellW / 2 - 1, 0, 2 * Math.PI);
             ctx.fill();
         }
 
-        const board = Array.from({ length: boardSize }, () => Array(boardSize).fill(emptyPos));
+        function drawLastMoveTag(){
+            let length = goBoard.moveHistory.length;
+            let colAndRow = goBoard.stepColAndRow(length-1);
+            if(colAndRow!=null){
+                let col = colAndRow.col;
+                let row = colAndRow.row;
+                let color = goBoard.posColor(col,row) == go.BLACK ? 'red':'blue';
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.moveTo(col * cellW, row * cellH - 7);
+                ctx.lineTo(col * cellW - 5, row * cellH+3);
+                ctx.lineTo(col * cellW + 5, row * cellH+3);
+                ctx.fill();
+            }
+        }
 
-        let isBlack = true;
+        function init() {
+            drawBoard();
+            drawStar();
+        }
+
+        function refresh() {
+            drawBoard();
+            drawStar();
+            for (let row = 1; row <= 19; row++) {
+                for (let col = 1; col <= 19; col++) {
+                    drawPiece(row, col, goBoard.posColor(col,row));
+                }
+            }
+            drawLastMoveTag();
+        }
+
+        init();
+ 
+        function movePiece(row,col){
+            let color = goBoard.turn
+            let res = goBoard.makeMoveByColAndRow(col,row);
+            if(res){
+                refresh();
+                console.log(goBoard.showBoard())
+            }
+        }
+
+       
         canvas.addEventListener('click', function (event) {
             let x = event.offsetX;
             let y = event.offsetY;
@@ -89,28 +151,20 @@
             let row = Math.round(y / cellH);
             if (col < 1 || col > boardSize) return;
             if (row < 1 || row > boardSize) return;
-            //此处有子不能下
-            if (board[row - 1][col - 1] != emptyPos) return;
-            // let diffX = cellW*col - x;
-            // let diffY = cellH*row - y;
-            // if(diffX>cellW*0.6 || diffX< -cellW*0.6) return;
-            // if(diffY>cellH*0.6 || diffY< -cellH*0.6) return;
+            movePiece(row,col);
+        });
 
-            if (isBlack) {
-                ctx.fillStyle = 'black';
-                ctx.beginPath();
-                ctx.arc(col * cellW, row * cellH, cellW / 2 - 4, 0, 2 * Math.PI);
-                ctx.fill();
-                board[row - 1][col - 1] = blackStone;
-            } else {
-                ctx.fillStyle = '#f0f0f0'; // Light gray;
-                ctx.beginPath();
-                ctx.arc(col * cellW, row * cellH, cellW / 2 - 4, 0, 2 * Math.PI);
-                ctx.fill();
-                board[row - 1][col - 1] = whiteStone;
-            }
+        let clearButton = document.getElementById('clearBoard');
+        clearButton.addEventListener('click', function () {
+            goBoard.clearBoard();
+            refresh();
+        });
 
-            isBlack = !isBlack;
+        let undoButton = document.getElementById('undoMove');
+        undoButton.addEventListener('click', function () {
+                if(goBoard.undo()){
+                    refresh();
+                }
         });
 
     </script>

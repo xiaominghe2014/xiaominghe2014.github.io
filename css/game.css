@@ -69,6 +69,10 @@ a {
   --menu-link-active-color: var(--green-color);
 }
 
+.menu-hover-fill li:nth-child(7) {
+  --menu-link-active-color: var(--info-color);
+}
+
 .menu-hover-fill li:hover::before {
   left: calc(100% + 1rem);
 }
