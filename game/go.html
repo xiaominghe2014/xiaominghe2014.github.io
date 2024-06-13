@@ -8,6 +8,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>围棋棋盘</title>
     <style>
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+            transform: translateY(-3px);
+        }
+
+        button:active {
+            background-color: #004085;
+            box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.24), 0 9px 30px 0 rgba(0, 0, 0, 0.19);
+            transform: translateY(2px);
+        }
+
         #boardCanvas {
             margin: 0 auto;
             display: block;
@@ -36,9 +59,9 @@
         ];
 
 
-        const board = Array(boardSize*boardSize).fill(go.EMPTY);
+        const board = Array(boardSize * boardSize).fill(go.EMPTY);
 
-        let goBoard = new go.Board(board,boardSize);
+        let goBoard = new go.Board(board, boardSize);
 
         const xArr = "ABCDEFGHJKLMNOPQRST";
 
@@ -54,6 +77,11 @@
             ctx.fillStyle = 'lightyellow';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            // 动态调整字体大小和边缘空间
+            let fontSize = Math.max(cellW / 3, 12); // 确保字体不会太小
+            ctx.font = fontSize + "px Arial";
+            let offset = fontSize * 1.5; // 增加边缘空间
+
             // 绘制棋盘线
             ctx.strokeStyle = 'black';
             for (let i = 1; i <= boardSize; i++) {
@@ -67,15 +95,15 @@
                 ctx.lineTo(w - cellW, cellH * i);
                 ctx.stroke();
 
-                ctx.font = "12px Arial";
+                // 绘制坐标文本
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
                 ctx.fillStyle = "black";
-                ctx.fillText(xArr[i - 1], cellW * i, w - cellH / 2 + 6);
-                ctx.fillText(xArr[i - 1], cellW * i, cellH / 2 - 6);
+                ctx.fillText(xArr[i - 1], cellW * i, offset / 2);
+                ctx.fillText(xArr[i - 1], cellW * i, w - offset / 2);
 
-                ctx.fillText(i, w - cellW / 2 + 6, cellH * i);
-                ctx.fillText(i, cellW / 2 - 6, cellH * i);
+                ctx.fillText(i, offset / 2, cellH * i);
+                ctx.fillText(i, w - offset / 2, cellH * i);
             }
         }
 
@@ -99,18 +127,18 @@
             ctx.fill();
         }
 
-        function drawLastMoveTag(){
+        function drawLastMoveTag() {
             let length = goBoard.moveHistory.length;
-            let colAndRow = goBoard.stepColAndRow(length-1);
-            if(colAndRow!=null){
+            let colAndRow = goBoard.stepColAndRow(length - 1);
+            if (colAndRow != null) {
                 let col = colAndRow.col;
                 let row = colAndRow.row;
-                let color = goBoard.posColor(col,row) == go.BLACK ? 'red':'blue';
+                let color = goBoard.posColor(col, row) == go.BLACK ? 'red' : 'blue';
                 ctx.fillStyle = color;
                 ctx.beginPath();
                 ctx.moveTo(col * cellW, row * cellH - 7);
-                ctx.lineTo(col * cellW - 5, row * cellH+3);
-                ctx.lineTo(col * cellW + 5, row * cellH+3);
+                ctx.lineTo(col * cellW - 5, row * cellH + 3);
+                ctx.lineTo(col * cellW + 5, row * cellH + 3);
                 ctx.fill();
             }
         }
@@ -120,29 +148,42 @@
             drawStar();
         }
 
+        function resizeCanvas() {
+            w = window.innerWidth > window.innerHeight ? window.innerHeight : window.innerWidth;
+            canvas.width = w;
+            canvas.height = w;
+            cellW = w / 20;
+            cellH = w / 20;
+        }
+
+        window.addEventListener('resize', function () {
+            resizeCanvas();
+            refresh();
+        });
+
         function refresh() {
             drawBoard();
             drawStar();
             for (let row = 1; row <= 19; row++) {
                 for (let col = 1; col <= 19; col++) {
-                    drawPiece(row, col, goBoard.posColor(col,row));
+                    drawPiece(row, col, goBoard.posColor(col, row));
                 }
             }
             drawLastMoveTag();
         }
 
         init();
- 
-        function movePiece(row,col){
+
+        function movePiece(row, col) {
             let color = goBoard.turn
-            let res = goBoard.makeMoveByColAndRow(col,row);
-            if(res){
+            let res = goBoard.makeMoveByColAndRow(col, row);
+            if (res) {
                 refresh();
                 console.log(goBoard.showBoard())
             }
         }
 
-       
+
         canvas.addEventListener('click', function (event) {
             let x = event.offsetX;
             let y = event.offsetY;
@@ -151,7 +192,7 @@
             let row = Math.round(y / cellH);
             if (col < 1 || col > boardSize) return;
             if (row < 1 || row > boardSize) return;
-            movePiece(row,col);
+            movePiece(row, col);
         });
 
         let clearButton = document.getElementById('clearBoard');
@@ -162,9 +203,9 @@
 
         let undoButton = document.getElementById('undoMove');
         undoButton.addEventListener('click', function () {
-                if(goBoard.undo()){
-                    refresh();
-                }
+            if (goBoard.undo()) {
+                refresh();
+            }
         });
 
     </script>
