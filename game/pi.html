@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        .piInput {
+            color: blue;
+            text-align: left;
+            width: 80%;
+            /* 调整宽度以适应更多内容 */
+            min-height: 20px;
+            /* 设置最小高度 */
+            padding: 10px;
+            /* 增加内边距 */
+            border: 1px solid #ccc;
+            /* 添加边框 */
+            margin: 10% auto 0;
+            /* 距离顶部40% */
+            display: block;
+            white-space: pre-wrap;
+            /* 允许自动换行 */
+            overflow-wrap: break-word;
+            /* 长单词或URL地址也可以换行 */
+            background-color: rgb(196, 195, 205);
+            /* 设置背景颜色 */
+            outline: none;
+            /* 移除焦点时的轮廓 */
+        }
+
+        .incorrect {
+            color: red;
+        }
+
+        .unknow {
+            color: grey;
+        }
+
+        #digitCount {
+            text-align: center;
+            margin: 20% auto 0;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="digitCount">小数点后2位</div>
+    <div id="piInput" class="piInput" contenteditable="true" placeholder="输入π的值" oninput="handleInput(event)">3.14</div>
+    <script>
+        const correctPi = "3.14159 26535 89793 23846 26433 83279 50288 41971 69399 37510 58209 74944 59230 78164 06286 20899 86280 34825 34211 70679 82148 08651 32823 06647 09384 46095 50582 23172 53594 08128 48111 74502 84102 70193 85211 05559 64462 29489 54930 38196 44288 10975 66593 34461 28475 64823 37867";
+        const piInput = document.getElementById('piInput');
+        let old = piInput.innerText;
+        setCaret(); 
+        function handleInput(event) {
+            const userInput = piInput.innerText.replace(/\s+/g, ''); // 移除用户输入中的所有空格
+            console.log(userInput);
+            if (!/^[3][.][1-4][0-9]*$/.test(userInput)) {
+                event.preventDefault();
+                piInput.innerHTML = old;
+                setCaret(); 
+                return; // 如果输入不是以3.14开始或包含非数字字符，则不允许输入
+            }
+            let formattedInput = '';
+            let htmlContent = '';
+            for (let i = 0; i < userInput.length; i++) {
+                formattedInput += userInput[i];
+                if (i < 6) continue;
+                let t = i - 2;
+                if ((t + 1) % 5 === 0) {
+                    formattedInput += ' '; // 每五位后添加一个空格
+                }
+            }
+            piInput.innerText = formattedInput; // 更新输入框的值
+            for (let i = 0; i < formattedInput.length; i++) {
+                if (i >= correctPi.length) {
+                    htmlContent += `<span class="unknow">${formattedInput[i]}</span>`;
+                } else {
+                    if (formattedInput[i] !== correctPi[i]) {
+                        htmlContent += `<span class="incorrect">${formattedInput[i]}</span>`;
+                    } else {
+                        htmlContent += formattedInput[i];
+                    }
+                }
+            }
+            old = htmlContent;
+            piInput.innerHTML = htmlContent; // 更新输入框的HTML内容
+            let arr = userInput.split(".");
+            if (arr.length > 1) {
+                document.getElementById('digitCount').innerText = `小数点后${arr[1].length}位`; // 更新显示位数的元素
+            } else {
+                document.getElementById('digitCount').innerText = `小数点后0位`;
+            }
+            setCaret(); // 保持光标位置
+        }
+
+        function setCaret() {
+
+            window.setTimeout(function () {
+                const range = document.createRange();
+                const sel = window.getSelection();
+                try {
+                    let len = piInput.childNodes.length;
+                    let lastNode = piInput.childNodes[len - 1];
+                    let cursorPosition = 1;
+                    if (lastNode.nodeType === Node.TEXT_NODE) {
+                        cursorPosition = lastNode.data.length;
+                    }
+                    range.setStart(lastNode, cursorPosition);
+                    range.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                } catch (e) {
+                    console.error('设置光标位置出错:', e);
+                }
+            }, 1);
+        }
+    </script>
+</body>
+
+</html>
