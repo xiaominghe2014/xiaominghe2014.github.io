@@ -97,7 +97,7 @@
 
         function setCaret() {
 
-            window.setTimeout(function () {
+            requestAnimationFrame(function () {
                 const range = document.createRange();
                 const sel = window.getSelection();
                 try {
@@ -114,7 +114,7 @@
                 } catch (e) {
                     console.error('设置光标位置出错:', e);
                 }
-            }, 1);
+            });
         }
     </script>
 </body>
