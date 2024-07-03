@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网页多开</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: auto;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100%; 
+        }
+
+        .add-box {
+            width: 200px;
+            height: 200px;
+            margin: 10px;
+            border: 1px dashed #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .box {
+            width: 270px;
+            height: 430px;
+            margin: 10px;
+            border: 1px solid #000;
+            flex: 0 0 auto;
+            /* 确保每个box不会缩放 */
+            position: relative;
+        }
+
+        .add-box {
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+            border: 1px dashed #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 40px;
+        }
+
+        .box-number {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+        .refresh-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="container"></div>
+    <div class="add-box" id="addBox">+</div>
+    <script>
+        function getQueryString(name) {
+            var result = window.location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+            if (result == null || result.length < 1) {
+                return "";
+            }
+            return result[1];
+        }
+        // var u = getQueryString("url");
+        // if(u==void 0){
+        //     u = 'https://cdn.ixiaqi.net/app/release/index.html'; 
+        // }
+        const container = document.getElementById('container');
+
+        const url = 'https://cdn.ixiaqi.net/app/release/index.html'; 
+        function createBox(index) {
+            const box = document.createElement('div');
+            box.className = 'box';
+
+            const numberLabel = document.createElement('div');
+            numberLabel.className = 'box-number';
+            numberLabel.textContent = index;
+
+            const iframe = document.createElement('iframe');
+            iframe.dataset.src = url; // 使用 data-src 存储 URL
+
+            const refreshButton = document.createElement('div');
+            refreshButton.className = 'refresh-button';
+            refreshButton.textContent = '刷新';
+            refreshButton.onclick = () => {
+                iframe.src = iframe.src; // 刷新iframe
+            };
+
+            box.appendChild(numberLabel);
+            box.appendChild(refreshButton);
+            box.appendChild(iframe);
+            return box;
+        }
+
+        function lazyLoadIframe(entries, observer) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const iframe = entry.target.querySelector('iframe');
+                    if (iframe && !iframe.src) {
+                        iframe.src = iframe.dataset.src;
+                    }
+                }
+            });
+        }
+
+        const observer = new IntersectionObserver(lazyLoadIframe, {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        });
+
+        let boxCount = 1;
+        const addBox = document.getElementById('addBox');
+        for (let i = 0; i < boxCount; i++) {
+            const box = createBox(i + 1);
+            container.appendChild(box);
+            observer.observe(box);
+        }
+        addBox.onclick = () => {
+            boxCount++;
+            const box = createBox(boxCount);
+            container.appendChild(box);
+            observer.observe(box);
+        };
+    </script>
+</body>
+
+</html>
