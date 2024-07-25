@@ -43,6 +43,7 @@
     <div style="text-align: center;">
         <button id="clearBoard">清空棋盘</button>
         <button id="undoMove">悔棋</button>
+        <select id="aiLevel"></select>
     </div>
     <canvas id="boardCanvas"></canvas>
     <!-- <button id="clearBoard">清空棋盘</button>
@@ -50,6 +51,7 @@
     <button id="switchToWhite">切换白棋</button> -->
 
     <script>
+        let select = document.getElementById("aiLevel");
         const boardSize = 19;
         //绘制棋盘星位小圆点
         const starPoints = [
@@ -58,6 +60,7 @@
             [4, 16], [10, 16], [16, 16]
         ];
 
+        let moves = [];
 
         const board = Array(boardSize * boardSize).fill(go.EMPTY);
 
@@ -102,8 +105,8 @@
                 ctx.fillText(xArr[i - 1], cellW * i, offset / 2);
                 ctx.fillText(xArr[i - 1], cellW * i, w - offset / 2);
 
-                ctx.fillText(i, offset / 2, cellH * i);
-                ctx.fillText(i, w - offset / 2, cellH * i);
+                ctx.fillText(boardSize-i+1, offset / 2, cellH * i);
+                ctx.fillText(boardSize-i+1, w - offset / 2, cellH * i);
             }
         }
 
@@ -146,6 +149,23 @@
         function init() {
             drawBoard();
             drawStar();
+            populateAiLevelOptions();
+        }
+
+        function populateAiLevelOptions() {
+            const aiLevelSelect = document.getElementById('aiLevel');
+            const levels = [
+                "18k", "17k", "16k", "15k", "14k", "13k", "12k", "11k", "10k",
+                "9k", "8k", "7k", "6k", "5k", "4k", "3k", "2k", "1k",
+                "1d", "2d", "3d","4d", "5d", "6d", "7d", "8d", "9d"
+            ];
+
+            levels.forEach(level => {
+                const option = document.createElement('option');
+                option.value = level;
+                option.text = level;
+                aiLevelSelect.appendChild(option);
+            });
         }
 
         function resizeCanvas() {
@@ -180,11 +200,48 @@
             if (res) {
                 refresh();
                 console.log(goBoard.showBoard())
+                let lastGTP = goBoard.getLastGTPMv();
+                let arr = lastGTP.split(' ')
+                moves.push([arr[1] == "black" ? "B" : "W", arr[2]])
             }
+            return res;
         }
 
+        let waitAi = false;
+
+        function genAiMove() {
+            let aiLevel = document.getElementById('aiLevel').value;
+            let komi = 7.5;
+            let boardSize = 19;
+            fetch('https://katago-ai-service-katago-diuadvngji.cn-hangzhou.fcapp.run/genmove', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ aiLevel, moves,komi,boardSize})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    waitAi = false;
+                    console.log('Success:', data);
+                    if (data.code == 0) {
+                        let r = data.data.result
+                        let gtpCoord = r.split(" ")[2];
+                        let xStr = gtpCoord.slice(0,1);
+                        let yStr = gtpCoord.slice(1);
+                        let x = "ABCDEFGHJKLMNOPQRSTUVWXYZ".indexOf(xStr);
+                        let y = parseInt(yStr);
+                        let b = movePiece(19- y + 1, x + 1);
+                    }
+                })
+                .catch((error) => {
+                    waitAi = false;
+                    console.error('Error:', error);
+                });
+        }
 
         canvas.addEventListener('click', function (event) {
+            if (waitAi) return;
             let x = event.offsetX;
             let y = event.offsetY;
 
@@ -192,11 +249,15 @@
             let row = Math.round(y / cellH);
             if (col < 1 || col > boardSize) return;
             if (row < 1 || row > boardSize) return;
-            movePiece(row, col);
+            if (movePiece(row, col)) {
+                waitAi = true;
+                genAiMove();
+            }
         });
 
         let clearButton = document.getElementById('clearBoard');
         clearButton.addEventListener('click', function () {
+            moves = [];
             goBoard.clearBoard();
             refresh();
         });
@@ -204,6 +265,7 @@
         let undoButton = document.getElementById('undoMove');
         undoButton.addEventListener('click', function () {
             if (goBoard.undo()) {
+                moves.pop();
                 refresh();
             }
         });
