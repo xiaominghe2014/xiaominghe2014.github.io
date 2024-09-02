@@ -77,7 +77,7 @@
         let cellH = w / 20;
 
         function drawBoard() {
-            ctx.fillStyle = 'lightyellow';
+            ctx.fillStyle = '#e2b864';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             // 动态调整字体大小和边缘空间
@@ -213,7 +213,7 @@
             let aiLevel = document.getElementById('aiLevel').value;
             let komi = 7.5;
             let boardSize = 19;
-            fetch('https://katago-ai-service-katago-diuadvngji.cn-hangzhou.fcapp.run/genmove', {
+            fetch('https://katago-ai-service-katago-diuadvngji.cn-hangzhou.fcapp.run/genmove_test', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
