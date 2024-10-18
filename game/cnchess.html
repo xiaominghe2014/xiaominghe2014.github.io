@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国象棋棋盘</title>
+    <style>
+        .chessboard {
+            /* display: grid; */
+            /* grid-template-columns: repeat(9, 50px);
+            grid-template-rows: repeat(10, 50px); */
+            gap: 1px;
+            background-color: #f0d9b5;
+            width: 451px;
+            height: 501px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="chessboard" class="chessboard"></div>
+
+    <script>
+        const chessboard = document.getElementById('chessboard');
+        const canvas = document.createElement('canvas');
+        canvas.width = 451;
+        canvas.height = 501;
+        canvas.style.position = 'absolute';
+        // canvas.style.pointerEvents = 'none';
+        chessboard.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        function drawChessboard() {
+            // 绘制棋盘线条
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 1;
+
+            // 绘制横线
+            for (let i = 0; i < 10; i++) {
+                ctx.beginPath();
+                ctx.moveTo(25, 25 + i * 50);
+                ctx.lineTo(425, 25 + i * 50);
+                ctx.stroke();
+            }
+
+            // 绘制竖线
+            for (let i = 0; i < 9; i++) {
+                ctx.beginPath();
+                ctx.moveTo(25 + i * 50, 25);
+                // 跳过楚河汉界所在的行
+                if (i == 0 || i == 8) {
+                    ctx.lineTo(25 + i * 50, 475);
+                } else {
+                    ctx.lineTo(25 + i * 50, 225);
+                    ctx.moveTo(25 + i * 50, 275);
+                    ctx.lineTo(25 + i * 50, 475);
+                }
+                ctx.stroke();
+            }
+
+            // 绘制楚河汉界
+            ctx.font = '20px Arial';
+            ctx.fillStyle = 'black';
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText('楚河', 155, 250);
+            ctx.fillText('漢界', 290, 250);
+
+            // 绘制斜线（九宫格）
+            ctx.beginPath();
+            ctx.moveTo(175, 25);
+            ctx.lineTo(275, 125);
+            ctx.moveTo(275, 25);
+            ctx.lineTo(175, 125);
+            ctx.moveTo(175, 375);
+            ctx.lineTo(275, 475);
+            ctx.moveTo(275, 375);
+            ctx.lineTo(175, 475);
+            ctx.stroke();
+
+            //在初始化 兵和炮的位置绘制 ╬ 标志
+            function drawCrossSymbol(x, y, side) {
+                // ctx.strokeStyle = "rgb(0,0,0)"
+                ctx.beginPath();
+                if (side != 0) {
+                    ctx.moveTo(x - 3, y - 3);
+                    ctx.lineTo(x - 10, y - 3);
+                    ctx.moveTo(x - 3, y - 3);
+                    ctx.lineTo(x - 3, y - 10);
+
+                    ctx.moveTo(x - 3, y + 3);
+                    ctx.lineTo(x - 10, y + 3);
+                    ctx.moveTo(x - 3, y + 3);
+                    ctx.lineTo(x - 3, y + 10);
+                }
+                if (side != 1) {
+                    ctx.moveTo(x + 3, y - 3);
+                    ctx.lineTo(x + 10, y - 3);
+                    ctx.moveTo(x + 3, y - 3);
+                    ctx.lineTo(x + 3, y - 10);
+
+                    ctx.moveTo(x + 3, y + 3);
+                    ctx.lineTo(x + 10, y + 3);
+                    ctx.moveTo(x + 3, y + 3);
+                    ctx.lineTo(x + 3, y + 10);
+                }
+                ctx.stroke();
+            }
+
+            // 绘制兵（卒）的位置
+            const soldierPositions = [
+                { x: 25, y: 175, side: 0 }, { x: 125, y: 175 }, { x: 225, y: 175 }, { x: 325, y: 175 }, { x: 425, y: 175, side: 1 },
+                { x: 25, y: 325, side: 0 }, { x: 125, y: 325 }, { x: 225, y: 325 }, { x: 325, y: 325 }, { x: 425, y: 325, side: 1 }
+            ];
+
+            // 绘制炮的位置
+            const cannonPositions = [
+                { x: 75, y: 125 }, { x: 375, y: 125 },
+                { x: 75, y: 375 }, { x: 375, y: 375 }
+            ];
+
+            // 绘制所有兵和炮的位置
+            [...soldierPositions, ...cannonPositions].forEach(pos => {
+                drawCrossSymbol(pos.x, pos.y, pos.side);
+            });
+
+        }
+
+        // 绘制黑將和红帥棋子
+        function drawPice(x, y, isRed, text, isSelected = false) {
+            ctx.beginPath();
+            ctx.arc(x, y, 20, 0, 2 * Math.PI);
+            ctx.fillStyle = isRed ? "red" : "black";
+            ctx.fill();
+            ctx.strokeStyle = "black";
+            ctx.stroke();
+
+            if (isSelected) {
+                // 添加白色圆形边框
+                ctx.beginPath();
+                ctx.arc(x, y, 23, 0, 2 * Math.PI);
+                ctx.strokeStyle = isRed ? "blue":"green";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // 添加阴影效果
+                // ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                // ctx.shadowBlur = 5;
+                // ctx.shadowOffsetX = 2;
+                // ctx.shadowOffsetY = 2;
+            } else {
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+            }
+
+            ctx.fillStyle = "white";
+            ctx.font = "bold 24px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(text, x, y);
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+        }
+        // 定义棋盘的起始坐标和格子大小
+        const boardStartX = 25;
+        const boardStartY = 25;
+        const cellSize = 50;
+
+        // 转换逻辑坐标到实际坐标的函数
+        function logicToRealCoord(logicX, logicY) {
+            const realX = boardStartX + logicX * cellSize;
+            const realY = boardStartY + (9 - logicY) * cellSize; // 注意Y轴是从下到上的
+            return { x: realX, y: realY };
+        }
+
+        // 转换实际坐标到逻辑坐标的函数
+        function realToLogicCoord(realX, realY) {
+            const logicX = Math.round((realX - boardStartX) / cellSize);
+            const logicY = Math.round(9 - (realY - boardStartY) / cellSize); // 注意Y轴是从下到上的
+            return { x: logicX, y: logicY };
+        }
+        const defaultFen = [
+            { x: 0, y: 0, isRed: true, text: "俥" },
+            { x: 1, y: 0, isRed: true, text: "傌" },
+            { x: 2, y: 0, isRed: true, text: "相" },
+            { x: 3, y: 0, isRed: true, text: "仕" },
+            { x: 4, y: 0, isRed: true, text: "帥" },
+            { x: 5, y: 0, isRed: true, text: "仕" },
+            { x: 6, y: 0, isRed: true, text: "相" },
+            { x: 7, y: 0, isRed: true, text: "傌" },
+            { x: 8, y: 0, isRed: true, text: "俥" },
+
+            { x: 1, y: 2, isRed: true, text: "炮" },
+            { x: 7, y: 2, isRed: true, text: "炮" },
+
+            { x: 0, y: 3, isRed: true, text: "兵" },
+            { x: 2, y: 3, isRed: true, text: "兵" },
+            { x: 4, y: 3, isRed: true, text: "兵" },
+            { x: 6, y: 3, isRed: true, text: "兵" },
+            { x: 8, y: 3, isRed: true, text: "兵" },
+
+
+            { x: 0, y: 9, isRed: false, text: "車" },
+            { x: 1, y: 9, isRed: false, text: "馬" },
+            { x: 2, y: 9, isRed: false, text: "象" },
+            { x: 3, y: 9, isRed: false, text: "士" },
+            { x: 4, y: 9, isRed: false, text: "將" },
+            { x: 5, y: 9, isRed: false, text: "士" },
+            { x: 6, y: 9, isRed: false, text: "象" },
+            { x: 7, y: 9, isRed: false, text: "馬" },
+            { x: 8, y: 9, isRed: false, text: "車" },
+
+            { x: 1, y: 7, isRed: false, text: "砲" },
+            { x: 7, y: 7, isRed: false, text: "砲" },
+
+            { x: 0, y: 6, isRed: false, text: "卒" },
+            { x: 2, y: 6, isRed: false, text: "卒" },
+            { x: 4, y: 6, isRed: false, text: "卒" },
+            { x: 6, y: 6, isRed: false, text: "卒" },
+            { x: 8, y: 6, isRed: false, text: "卒" },
+        ];
+
+        drawChessboard();
+        defaultFen.forEach(p => {
+            const realPos = logicToRealCoord(p.x, p.y);
+            drawPice(realPos.x, realPos.y, p.isRed, p.text)
+        })
+
+
+        // 示例：将红帥从(4, 0)移动到(4, 1)
+        // movePiece(4, 0, 4, 1);
+        let selectedPiece = null;
+
+        // 移动棋子的方法
+        function movePiece(logicStartX, logicStartY, logicEndX, logicEndY) {
+            const pieceIndex = defaultFen.findIndex(p => p.x === logicStartX && p.y === logicStartY);
+            if (pieceIndex === -1) {
+                console.error("没有找到棋子在起始位置");
+                return;
+            }
+
+            // 检查目标位置是否有棋子
+            const targetIndex = defaultFen.findIndex(p => p.x === logicEndX && p.y === logicEndY);
+            if (targetIndex !== -1) {
+                console.error("目标位置已经有棋子");
+                return;
+            }
+
+            // 更新棋子的逻辑位置
+            defaultFen[pieceIndex].x = logicEndX;
+            defaultFen[pieceIndex].y = logicEndY;
+
+            // 清除棋盘并重新绘制
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawChessboard();
+            defaultFen.forEach(p => {
+                const realPos = logicToRealCoord(p.x, p.y);
+                const isSelected = logicEndX === p.x && logicEndY === p.y;
+                drawPice(realPos.x, realPos.y, p.isRed, p.text,isSelected);
+            });
+        }
+
+
+        // 添加点击事件监听器
+        canvas.addEventListener('click', (event) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            const logicPos = realToLogicCoord(x, y);
+
+            if (selectedPiece) {
+                // 如果已经选择了一个棋子，尝试移动到新的位置
+                const pieceIndex = defaultFen.findIndex(p => p.x === logicPos.x && p.y === logicPos.y);
+                if (pieceIndex !== -1) {
+                    selectedPiece = { x: logicPos.x, y: logicPos.y };
+                    // 清除棋盘并重新绘制
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    drawChessboard();
+                    defaultFen.forEach(p => {
+                        const realPos = logicToRealCoord(p.x, p.y);
+                        const isSelected = selectedPiece && selectedPiece.x === p.x && selectedPiece.y === p.y;
+                        drawPice(realPos.x, realPos.y, p.isRed, p.text,isSelected);
+                    });
+                }else{
+                    movePiece(selectedPiece.x, selectedPiece.y, logicPos.x, logicPos.y);
+                    selectedPiece = null; // 重置选择
+                }
+            } else {
+                // 检查点击位置是否有棋子
+                const pieceIndex = defaultFen.findIndex(p => p.x === logicPos.x && p.y === logicPos.y);
+                if (pieceIndex !== -1) {
+                    selectedPiece = { x: logicPos.x, y: logicPos.y };
+                    // 清除棋盘并重新绘制
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    drawChessboard();
+                    defaultFen.forEach(p => {
+                        const realPos = logicToRealCoord(p.x, p.y);
+                        const isSelected = selectedPiece && selectedPiece.x === p.x && selectedPiece.y === p.y;
+                        drawPice(realPos.x, realPos.y, p.isRed, p.text,isSelected);
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
