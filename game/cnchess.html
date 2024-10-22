@@ -22,9 +22,66 @@
     <div id="chessboard" class="chessboard"></div>
 
     <script>
+        var step = 0;
+        var moveHistory = [];
         const initialFen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1";
+        const pieceMap = {
+            'r': { isRed: false, text: "車" },
+            'n': { isRed: false, text: "馬" },
+            'b': { isRed: false, text: "象" },
+            'a': { isRed: false, text: "士" },
+            'k': { isRed: false, text: "將" },
+            'c': { isRed: false, text: "砲" },
+            'p': { isRed: false, text: "卒" },
+            'R': { isRed: true, text: "俥" },
+            'N': { isRed: true, text: "傌" },
+            'B': { isRed: true, text: "相" },
+            'A': { isRed: true, text: "仕" },
+            'K': { isRed: true, text: "帥" },
+            'C': { isRed: true, text: "炮" },
+            'P': { isRed: true, text: "兵" }
+        };
+
+        // 定义棋盘的起始坐标和格子大小 更新cellSize和相关变量
+        let cellSize = calculateCellSize();
+        let boardStartX = Math.floor(cellSize / 2);
+        let boardStartY = Math.floor(cellSize / 2);
         boardPieceArr = fenToBoardPieceArr(initialFen);
         let selectedPiece = null;
+        const chessboard = document.getElementById('chessboard');
+        const canvas = document.createElement('canvas');
+        canvas.width = cellSize * 9 + 1;
+        canvas.height = cellSize * 10 + 1;
+        canvas.style.position = 'absolute';
+        // 动态设置chessboard的大小
+        chessboard.style.width = `${canvas.width}px`;
+        chessboard.style.height = `${canvas.height + 50}px`;
+        canvas.style.left = `${boardStartX}`;
+        canvas.style.top = `${boardStartY}`;
+        // canvas.style.pointerEvents = 'none';
+        chessboard.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        // 添加按钮容器
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.display = 'flex';
+        buttonContainer.style.justifyContent = 'center'; // 水平居中
+        buttonContainer.style.position = 'relative'; // 相对定位
+        buttonContainer.style.top = `${canvas.height + 15}px`; // 使按钮容器在棋盘底部
+        // buttonContainer.style.marginTop = '10px'; // 与棋盘之间的间距
+
+        const moveButton = document.createElement('button');
+        moveButton.textContent = '<';
+
+        const backButton = document.createElement('button');
+        backButton.textContent = '>';
+
+        // 将按钮添加到容器中
+        buttonContainer.appendChild(moveButton);
+        buttonContainer.appendChild(backButton);
+
+        // 将按钮容器添加到棋盘中
+        chessboard.appendChild(buttonContainer);
         // 根据视窗宽高自动适配设置cellSize
         function calculateCellSize() {
             const viewportWidth = window.innerWidth;
@@ -39,11 +96,6 @@
             // 选择较小的值以确保棋盘完全适应屏幕
             return Math.min(cellSizeFromWidth, cellSizeFromHeight);
         }
-
-        // 定义棋盘的起始坐标和格子大小 更新cellSize和相关变量
-        let cellSize = calculateCellSize();
-        let boardStartX = Math.floor(cellSize / 2);
-        let boardStartY = Math.floor(cellSize / 2);
 
         // 监听窗口大小变化，重新计算cellSize
         window.addEventListener('resize', function () {
@@ -62,6 +114,10 @@
                 const isSelected = selectedPiece && selectedPiece.x === p.x && selectedPiece.y === p.y;
                 drawPice(realPos.x, realPos.y, p.isRed, p.text, isSelected);
             });
+            buttonContainer.style.display = 'flex';
+            buttonContainer.style.justifyContent = 'center'; // 水平居中
+            buttonContainer.style.position = 'relative'; // 相对定位
+            buttonContainer.style.top = `${canvas.height + 15}px`; // 使按钮容器在棋盘底部
         });
         // 转换逻辑坐标到实际坐标的函数
         function logicToRealCoord(logicX, logicY) {
@@ -76,20 +132,8 @@
             const logicY = Math.round(9 - (realY - boardStartY) / cellSize); // 注意Y轴是从下到上的
             return { x: logicX, y: logicY };
         }
-        const chessboard = document.getElementById('chessboard');
-        const canvas = document.createElement('canvas');
-        canvas.width = cellSize * 9 + 1;
-        canvas.height = cellSize * 10 + 1;
-        canvas.style.position = 'absolute';
-        // 动态设置chessboard的大小
-        chessboard.style.width = `${canvas.width}px`;
-        chessboard.style.height = `${canvas.height}px`;
-        canvas.style.left = `${boardStartX}`;
-        canvas.style.top = `${boardStartY}`;
-        // canvas.style.pointerEvents = 'none';
-        chessboard.appendChild(canvas);
 
-        const ctx = canvas.getContext('2d');
+
         function drawChessboard() {
             // 绘制棋盘线条
             ctx.strokeStyle = 'black';
@@ -228,24 +272,6 @@
             const piecePlacement = fenParts[0];
             const rows = piecePlacement.split('/');
             const boardPieceArr = [];
-
-            const pieceMap = {
-                'r': { isRed: false, text: "車" },
-                'n': { isRed: false, text: "馬" },
-                'b': { isRed: false, text: "象" },
-                'a': { isRed: false, text: "士" },
-                'k': { isRed: false, text: "將" },
-                'c': { isRed: false, text: "砲" },
-                'p': { isRed: false, text: "卒" },
-                'R': { isRed: true, text: "俥" },
-                'N': { isRed: true, text: "傌" },
-                'B': { isRed: true, text: "相" },
-                'A': { isRed: true, text: "仕" },
-                'K': { isRed: true, text: "帥" },
-                'C': { isRed: true, text: "炮" },
-                'P': { isRed: true, text: "兵" }
-            };
-
             for (let y = 9; y >= 0; y--) {
                 let x = 0;
                 for (const char of rows[9 - y]) {
@@ -261,6 +287,147 @@
 
             return boardPieceArr;
         }
+        // 检查棋盘上逻辑坐标是否有棋子的函数
+        function hasPieceAt(logicX, logicY) {
+            return boardPieceArr.some(p => p.x === logicX && p.y === logicY);
+        }
+
+        // 获取棋子能走的点
+        function getValidMoves(logicX, logicY) {
+            const piece = boardPieceArr.find(p => p.x === logicX && p.y === logicY);
+            if (!piece) {
+                console.error("没有找到棋子");
+                return [];
+            }
+            const validMoves = [];
+
+            //Add logic to calculate valid moves
+            let p = piece.type
+            switch (p) {
+                case 'r':
+                case 'R':
+                    // 车的移动规则
+                    for (let i = 1; i <= 8; i++) {
+                        if (!hasPieceAt(logicX + i, logicY)) {
+                            validMoves.push({ x: logicX + i, y: logicY });
+                        } else {
+                            if (boardPieceArr[boardPieceArr.findIndex(p => p.x === logicX + i && p.y === logicY)].isRed !== piece.isRed) {
+                                validMoves.push({ x: logicX + i, y: logicY });
+                            }
+                            break;
+                        }
+                    }
+                    for (let i = 1; i <= 8; i++) {
+                        if (!hasPieceAt(logicX - i, logicY)) {
+                            validMoves.push({ x: logicX - i, y: logicY });
+                        } else {
+                            if (boardPieceArr[boardPieceArr.findIndex(p => p.x === logicX + i && p.y === logicY)].isRed !== piece.isRed) {
+                                validMoves.push({ x: logicX + i, y: logicY });
+                            }
+                            break;
+                        }
+                    }
+                    for (let i = 1; i <= 9; i++) {
+                        if (!hasPieceAt(logicX, logicY + i)) {
+                            validMoves.push({ x: logicX, y: logicY + i });
+                        } else {
+                            break;
+                        }
+                    }
+                    for (let i = 1; i <= 9; i++) {
+                        if (!hasPieceAt(logicX, logicY - i)) {
+                            validMoves.push({ x: logicX, y: logicY - i });
+                        } else {
+                            if (boardPieceArr[boardPieceArr.findIndex(p => p.x === logicX + i && p.y === logicY)].isRed !== piece.isRed) {
+                                validMoves.push({ x: logicX + i, y: logicY });
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                case 'n':
+                case 'N':
+                    // 马的移动规则
+                    validMoves.push({ x: logicX + 2, y: logicY + 1 });
+                    validMoves.push({ x: logicX + 2, y: logicY - 1 });
+                    validMoves.push({ x: logicX - 2, y: logicY + 1 });
+                    validMoves.push({ x: logicX - 2, y: logicY - 1 });
+                    validMoves.push({ x: logicX + 1, y: logicY + 2 });
+                    validMoves.push({ x: logicX + 1, y: logicY - 2 });
+                    validMoves.push({ x: logicX - 1, y: logicY + 2 });
+                    validMoves.push({ x: logicX - 1, y: logicY - 2 });
+                    break;
+                case 'b':
+                case 'B':
+                    // 象的移动规则
+                    validMoves.push({ x: logicX + 2, y: logicY + 2 });
+                    validMoves.push({ x: logicX + 2, y: logicY - 2 });
+                    validMoves.push({ x: logicX - 2, y: logicY + 2 });
+                    validMoves.push({ x: logicX - 2, y: logicY - 2 });
+                    validMoves.push({ x: logicX + 1, y: logicY + 1 });
+                    validMoves.push({ x: logicX + 1, y: logicY - 1 });
+                    validMoves.push({ x: logicX - 1, y: logicY + 1 });
+                    validMoves.push({ x: logicX - 1, y: logicY - 1 });
+                    break;
+                case 'a':
+                case 'A':
+                    // 士的移动规则
+                    validMoves.push({ x: logicX + 1, y: logicY + 1 });
+                    validMoves.push({ x: logicX + 1, y: logicY - 1 });
+                    validMoves.push({ x: logicX - 1, y: logicY + 1 });
+                    validMoves.push({ x: logicX - 1, y: logicY - 1 });
+                    break;
+                case 'k':
+                case 'K':
+                    // 将/帥的移动规则
+                    validMoves.push({ x: logicX + 1, y: logicY });
+                    validMoves.push({ x: logicX - 1, y: logicY });
+                    validMoves.push({ x: logicX, y: logicY + 1 });
+                    validMoves.push({ x: logicX, y: logicY - 1 });
+                    break;
+                case 'c':
+                case 'C':
+                    // 炮的移动规则
+                    for (let i = 1; i <= 8; i++) {
+                        if (!hasPieceAt(logicX + i, logicY)) {
+                            validMoves.push({ x: logicX + i, y: logicY });
+                        } else {
+                            break;
+                        }
+                    }
+                    for (let i = 1; i <= 8; i++) {
+                        if (!hasPieceAt(logicX - i, logicY)) {
+                            validMoves.push({ x: logicX - i, y: logicY });
+                        } else {
+                            break;
+                        }
+                    }
+                    for (let i = 1; i <= 9; i++) {
+                        if (!hasPieceAt(logicX, logicY + i)) {
+                            validMoves.push({ x: logicX, y: logicY + i });
+                        } else {
+                            break;
+                        }
+                    }
+                    for (let i = 1; i <= 9; i++) {
+                        if (!hasPieceAt(logicX, logicY - i)) {
+                            validMoves.push({ x: logicX, y: logicY - i });
+                        } else {
+                            break;
+                        }
+                    }
+                    // TODO 隔山打牛
+                    break;
+                case 'p':
+                case 'P':
+                    //卒/兵的移动规则
+                    validMoves.push({ x: logicX, y: logicY + 1 });
+                    validMoves.push({ x: logicX - 1, y: logicY });
+                    validMoves.push({ x: logicX + 1, y: logicY });
+                    break;
+            }
+            return validMoves;
+        }
 
         drawChessboard();
         boardPieceArr.forEach(p => {
@@ -273,10 +440,10 @@
 
         // 示例：将红帥从(4, 0)移动到(4, 1)
         // movePiece(4, 0, 4, 1);
-    
+
 
         // 移动棋子的方法
-        function movePiece(logicStartX, logicStartY, logicEndX, logicEndY) {
+        function movePiece(logicStartX, logicStartY, logicEndX, logicEndY, isWatch = false) {
             const pieceIndex = boardPieceArr.findIndex(p => p.x === logicStartX && p.y === logicStartY);
             if (pieceIndex === -1) {
                 console.error("没有找到棋子在起始位置");
@@ -302,11 +469,16 @@
                 const isSelected = logicEndX === p.x && logicEndY === p.y;
                 drawPice(realPos.x, realPos.y, p.isRed, p.text, isSelected);
             });
+            if (!isWatch) {
+                console.log("step:"+step);
+                console.log(moveHistory);
+                moveHistory = moveHistory.slice(0, step);
+                step++;
+                console.log("after step:"+step);
+                console.log(moveHistory);
+                moveHistory.push({ start: { x: logicStartX, y: logicStartY }, end: { x: logicEndX, y: logicEndY } });
+            }
         }
-
-
-
-
 
         // 添加点击事件监听器
         canvas.addEventListener('click', (event) => {
@@ -316,20 +488,18 @@
             const logicPos = realToLogicCoord(x, y);
 
             if (selectedPiece) {
+                let startX = selectedPiece.x;
+                let startY = selectedPiece.y;
+                if(startX===logicPos.x && startY===logicPos.y) return;
                 // 如果已经选择了一个棋子，尝试移动到新的位置
                 const pieceIndex = boardPieceArr.findIndex(p => p.x === logicPos.x && p.y === logicPos.y);
                 if (pieceIndex !== -1) {
                     selectedPiece = { x: logicPos.x, y: logicPos.y };
-                    // 清除棋盘并重新绘制
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    drawChessboard();
-                    boardPieceArr.forEach(p => {
-                        const realPos = logicToRealCoord(p.x, p.y);
-                        const isSelected = selectedPiece && selectedPiece.x === p.x && selectedPiece.y === p.y;
-                        drawPice(realPos.x, realPos.y, p.isRed, p.text, isSelected);
-                    });
+                    boardPieceArr.splice(pieceIndex, 1);
+                    movePiece(startX, startY, logicPos.x, logicPos.y);
+                    selectedPiece = null; // 重置选择
                 } else {
-                    movePiece(selectedPiece.x, selectedPiece.y, logicPos.x, logicPos.y);
+                    movePiece(startX, startY, logicPos.x, logicPos.y);
                     selectedPiece = null; // 重置选择
                 }
             } else {
@@ -348,6 +518,42 @@
                 }
             }
         });
+
+
+
+
+        moveButton.addEventListener('click', () => {
+            // Add logic to move backward
+            if (moveHistory.length > 0) {
+                step--;
+                boardPieceArr = fenToBoardPieceArr(initialFen);
+                selectedPiece = null
+                // 清除棋盘并重新绘制
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawChessboard();
+                boardPieceArr.forEach(p => {
+                    const realPos = logicToRealCoord(p.x, p.y);
+                    drawPice(realPos.x, realPos.y, p.isRed, p.text);
+                });
+                for (let i = 0; i < step; i++) {
+                    movePiece(moveHistory[i].start.x, moveHistory[i].start.y, moveHistory[i].end.x, moveHistory[i].end.y, true)
+                }
+            }
+        });
+
+
+        backButton.addEventListener('click', () => {
+            // Add logic to move forward
+            if (moveHistory.length > step) {
+                step++;
+                boardPieceArr = fenToBoardPieceArr(initialFen);
+                for (let i = 0; i < step; i++) {
+                    movePiece(moveHistory[i].start.x, moveHistory[i].start.y, moveHistory[i].end.x, moveHistory[i].end.y, true)
+                }
+            }
+        });
+
+
     </script>
 </body>
 
