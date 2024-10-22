@@ -70,15 +70,15 @@
         buttonContainer.style.top = `${canvas.height + 15}px`; // 使按钮容器在棋盘底部
         // buttonContainer.style.marginTop = '10px'; // 与棋盘之间的间距
 
-        const moveButton = document.createElement('button');
-        moveButton.textContent = '<';
-
         const backButton = document.createElement('button');
-        backButton.textContent = '>';
+        backButton.textContent = '<';
+
+        const moveButton = document.createElement('button');
+        moveButton.textContent = '>';
 
         // 将按钮添加到容器中
-        buttonContainer.appendChild(moveButton);
         buttonContainer.appendChild(backButton);
+        buttonContainer.appendChild(moveButton);
 
         // 将按钮容器添加到棋盘中
         chessboard.appendChild(buttonContainer);
@@ -444,19 +444,19 @@
 
         // 移动棋子的方法
         function movePiece(logicStartX, logicStartY, logicEndX, logicEndY, isWatch = false) {
+
+            // 检查目标位置是否有棋子
+            const targetIndex = boardPieceArr.findIndex(p => p.x === logicEndX && p.y === logicEndY);
+            if (targetIndex !== -1) {
+                console.info("目标位置已经有棋子");
+                boardPieceArr.splice(targetIndex, 1);
+            }
+
             const pieceIndex = boardPieceArr.findIndex(p => p.x === logicStartX && p.y === logicStartY);
             if (pieceIndex === -1) {
                 console.error("没有找到棋子在起始位置");
                 return;
             }
-
-            // 检查目标位置是否有棋子
-            const targetIndex = boardPieceArr.findIndex(p => p.x === logicEndX && p.y === logicEndY);
-            if (targetIndex !== -1) {
-                console.error("目标位置已经有棋子");
-                return;
-            }
-
             // 更新棋子的逻辑位置
             boardPieceArr[pieceIndex].x = logicEndX;
             boardPieceArr[pieceIndex].y = logicEndY;
@@ -469,13 +469,14 @@
                 const isSelected = logicEndX === p.x && logicEndY === p.y;
                 drawPice(realPos.x, realPos.y, p.isRed, p.text, isSelected);
             });
+            console.log(`${logicStartX},${logicStartY}=>${logicEndX},${logicEndY}`);
             if (!isWatch) {
-                console.log("step:"+step);
-                console.log(moveHistory);
+                // console.log("step:"+step);
+                // console.log(moveHistory);
                 moveHistory = moveHistory.slice(0, step);
                 step++;
                 console.log("after step:"+step);
-                console.log(moveHistory);
+                // console.log(moveHistory);
                 moveHistory.push({ start: { x: logicStartX, y: logicStartY }, end: { x: logicEndX, y: logicEndY } });
             }
         }
@@ -495,7 +496,6 @@
                 const pieceIndex = boardPieceArr.findIndex(p => p.x === logicPos.x && p.y === logicPos.y);
                 if (pieceIndex !== -1) {
                     selectedPiece = { x: logicPos.x, y: logicPos.y };
-                    boardPieceArr.splice(pieceIndex, 1);
                     movePiece(startX, startY, logicPos.x, logicPos.y);
                     selectedPiece = null; // 重置选择
                 } else {
@@ -522,11 +522,13 @@
 
 
 
-        moveButton.addEventListener('click', () => {
+        backButton.addEventListener('click', () => {
             // Add logic to move backward
-            if (moveHistory.length > 0) {
+            if (step > 0) {
                 step--;
+                console.log("回退"+step)
                 boardPieceArr = fenToBoardPieceArr(initialFen);
+                console.log(boardPieceArr)
                 selectedPiece = null
                 // 清除棋盘并重新绘制
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -542,11 +544,20 @@
         });
 
 
-        backButton.addEventListener('click', () => {
+        moveButton.addEventListener('click', () => {
             // Add logic to move forward
             if (moveHistory.length > step) {
                 step++;
+                console.log("前进"+step)
                 boardPieceArr = fenToBoardPieceArr(initialFen);
+                selectedPiece = null
+                // 清除棋盘并重新绘制
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawChessboard();
+                boardPieceArr.forEach(p => {
+                    const realPos = logicToRealCoord(p.x, p.y);
+                    drawPice(realPos.x, realPos.y, p.isRed, p.text);
+                });
                 for (let i = 0; i < step; i++) {
                     movePiece(moveHistory[i].start.x, moveHistory[i].start.y, moveHistory[i].end.x, moveHistory[i].end.y, true)
                 }
