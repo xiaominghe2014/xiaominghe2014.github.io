@@ -390,7 +390,7 @@
             let isRed = cnchess.turn === CnChess.Color.RED;
             const pieceIndex = boardPieceArr.findIndex(p => p.x === logicPos.x && p.y === logicPos.y && p.isRed === isRed);
             if (pieceIndex !== -1) {
-
+                console.log(cnchess.toFen())
                 selectedPiece = { x: logicPos.x, y: logicPos.y };
                 // 清除棋盘并重新绘制
                 let mvs = cnchess.getMoves(logicPos.x, 9 - logicPos.y);
