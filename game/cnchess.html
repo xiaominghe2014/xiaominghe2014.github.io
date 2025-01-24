@@ -71,7 +71,7 @@
         buttonContainer.style.position = 'relative'; // 相对定位
         buttonContainer.style.top = `${canvas.height + 15}px`; // 使按钮容器在棋盘底部
         // buttonContainer.style.marginTop = '10px'; // 与棋盘之间的间距
-
+        buttonContainer.style.display = 'none';
         const backButton = document.createElement('button');
         backButton.textContent = '<';
 
@@ -232,12 +232,14 @@
 
         }
 
-        function drawDot(x, y) {
+        function drawDot(x, y, isRed) {
             ctx.beginPath();
             ctx.arc(x, y, cellSize / 5, 0, 2 * Math.PI);
-            ctx.fillStyle = "white";
+            ctx.closePath();
+            let color = isRed ? 'rgba(0, 0, 255, 0.03)':'rgba(0, 255, 255, 0.2)';
+            ctx.fillStyle = color;
             ctx.fill();
-            ctx.stroke();
+            // ctx.stroke();
         }
 
         // 绘制黑將和红帥棋子
@@ -404,7 +406,7 @@
                             let [mx, my] = CnChess.idx2xy(mv,9);
                             const realMvPos = logicToRealCoord(mx, 9 - my);
                             //绘制蓝色小圆点
-                            drawDot(realMvPos.x, realMvPos.y);
+                            drawDot(realMvPos.x, realMvPos.y,isRed);
                         }
                     }
                 });
