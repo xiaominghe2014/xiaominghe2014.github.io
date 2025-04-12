@@ -1,17 +1,291 @@
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
-<style type="text/css">
-</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Rubik's Cube</title>
+    <style>
+        body { margin: 0; font-family: sans-serif; background-color: #f0f0f0; display: flex; justify-content: center; align-items: flex-start; height: 100vh; padding-top: 20px; }
+        #container { display: flex; flex-direction: column; align-items: center; }
+        #canvas-container { width: 80vmin; height: 70vmin; max-width: 600px; max-height: 500px; border: 1px solid #ccc; margin-bottom: 15px; }
+        canvas { display: block; } /* Important for Three.js */
+        #controls {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 5px;
+            width: 80vmin;
+            max-width: 600px;
+        }
+        .face-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            border-radius: 4px;
+        }
+        .face-controls span { font-weight: bold; margin-bottom: 5px; }
+        button {
+            padding: 6px 10px;
+            margin-top: 3px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background-color: #eee;
+            border-radius: 3px;
+            min-width: 40px;
+        }
+        button:hover { background-color: #ddd; }
+        .cw { /* Clockwise */ }
+        .ccw { /* Counter-Clockwise */ }
+    </style>
 </head>
-
-
 <body>
-    <canvas id="myCanvas" width="400" height="400"></canvas>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r110/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/17.1.1/Tween.min.js"></script>
+    <div id="container">
+        <div id="canvas-container"></div>
+        <div id="controls">
+            <div class="face-controls">
+                <span>Front (F)</span>
+                <button class="cw" onclick="rotateLayer('z', 1, -1)">CW</button>
+                <button class="ccw" onclick="rotateLayer('z', 1, 1)">CCW (F')</button>
+            </div>
+            <div class="face-controls">
+                <span>Back (B)</span>
+                <button class="cw" onclick="rotateLayer('z', -1, 1)">CW</button>
+                <button class="ccw" onclick="rotateLayer('z', -1, -1)">CCW (B')</button>
+            </div>
+            <div class="face-controls">
+                <span>Up (U)</span>
+                <button class="cw" onclick="rotateLayer('y', 1, -1)">CW</button>
+                <button class="ccw" onclick="rotateLayer('y', 1, 1)">CCW (U')</button>
+            </div>
+             <div class="face-controls">
+                <span>Down (D)</span>
+                <button class="cw" onclick="rotateLayer('y', -1, 1)">CW</button>
+                <button class="ccw" onclick="rotateLayer('y', -1, -1)">CCW (D')</button>
+            </div>
+            <div class="face-controls">
+                <span>Left (L)</span>
+                <button class="cw" onclick="rotateLayer('x', -1, 1)">CW</button>
+                <button class="ccw" onclick="rotateLayer('x', -1, -1)">CCW (L')</button>
+            </div>
+             <div class="face-controls">
+                <span>Right (R)</span>
+                <button class="cw" onclick="rotateLayer('x', 1, -1)">CW</button>
+                <button class="ccw" onclick="rotateLayer('x', 1, 1)">CCW (R')</button>
+            </div>
+        </div>
+    </div>
 
-    <script src="js/rubiks.js"></script>
+    <!-- Import Three.js, OrbitControls and Tween.js -->
+    <!-- Using CDN for simplicity -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
 
+    <script>
+        let scene, camera, renderer, controls;
+        let cubeGroup; // A group to hold all the small cubies
+        const cubies = []; // Array to store individual cubie meshes
+        let isRotating = false; // Flag to prevent concurrent rotations
+
+        const CUBE_SIZE = 3; // 3x3x3
+        const CUBIE_SIZE = 1;
+        const CUBIE_SPACING = 0.05; // Gap between cubies
+        const ACTUAL_CUBIE_SIZE = CUBIE_SIZE - CUBIE_SPACING;
+
+        // --- Initialization ---
+        function init() {
+            const container = document.getElementById('canvas-container');
+
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xeeeeee);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.z = 5;
+            camera.position.y = 4;
+            camera.position.x = 4;
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+            directionalLight.position.set(5, 10, 7.5);
+            scene.add(directionalLight);
+
+            // Controls (Mouse interaction)
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true; // Smooth camera movement
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = false;
+            controls.minDistance = 5;
+            controls.maxDistance = 20;
+
+            // Create the Cube
+            createRubiksCube();
+
+            // Handle window resize
+            window.addEventListener('resize', onWindowResize, false);
+
+            // Start animation loop
+            animate();
+        }
+
+        // --- Create Rubik's Cube ---
+        function createRubiksCube() {
+            cubeGroup = new THREE.Group();
+            const centerOffset = (CUBE_SIZE - 1) / 2; // To center the cube at (0,0,0)
+
+            const geometry = new THREE.BoxGeometry(ACTUAL_CUBIE_SIZE, ACTUAL_CUBIE_SIZE, ACTUAL_CUBIE_SIZE);
+
+            // Define face colors (Standard Rubik's Colors)
+            const colors = {
+                front:  new THREE.MeshStandardMaterial({ color: 0x0000ff }), // Blue (Z+)
+                back:   new THREE.MeshStandardMaterial({ color: 0x00ff00 }), // Green (Z-)
+                up:     new THREE.MeshStandardMaterial({ color: 0xffffff }), // White (Y+)
+                down:   new THREE.MeshStandardMaterial({ color: 0xffff00 }), // Yellow (Y-)
+                left:   new THREE.MeshStandardMaterial({ color: 0xffa500 }), // Orange (X-)
+                right:  new THREE.MeshStandardMaterial({ color: 0xff0000 }), // Red (X+)
+                inner:  new THREE.MeshStandardMaterial({ color: 0x111111 })  // Black/Dark Gray for inner faces
+            };
+
+            for (let x = 0; x < CUBE_SIZE; x++) {
+                for (let y = 0; y < CUBE_SIZE; y++) {
+                    for (let z = 0; z < CUBE_SIZE; z++) {
+                        // Skip the invisible center cubie for size > 1
+                        if (CUBE_SIZE % 2 !== 0) { // Only for odd sized cubes
+                             const isCenterPiece = (x > 0 && x < CUBE_SIZE - 1) &&
+                                                  (y > 0 && y < CUBE_SIZE - 1) &&
+                                                  (z > 0 && z < CUBE_SIZE - 1);
+                             if (isCenterPiece) continue;
+                         }
+
+                        const materials = [
+                            (x === CUBE_SIZE - 1) ? colors.right : colors.inner, // Right face (+X)
+                            (x === 0) ? colors.left : colors.inner,               // Left face (-X)
+                            (y === CUBE_SIZE - 1) ? colors.up : colors.inner,     // Top face (+Y)
+                            (y === 0) ? colors.down : colors.inner,               // Bottom face (-Y)
+                            (z === CUBE_SIZE - 1) ? colors.front : colors.inner,  // Front face (+Z)
+                            (z === 0) ? colors.back : colors.inner,               // Back face (-Z)
+                        ];
+
+                        const cubie = new THREE.Mesh(geometry, materials);
+
+                        // Position relative to the center of the cube
+                        cubie.position.set(
+                            (x - centerOffset) * CUBIE_SIZE,
+                            (y - centerOffset) * CUBIE_SIZE,
+                            (z - centerOffset) * CUBIE_SIZE
+                        );
+
+                        // Store original logical position (useful for identifying layers)
+                        cubie.userData.logicalPosition = {
+                            x: x - centerOffset,
+                            y: y - centerOffset,
+                            z: z - centerOffset
+                        };
+
+                        cubeGroup.add(cubie);
+                        cubies.push(cubie);
+                    }
+                }
+            }
+            scene.add(cubeGroup);
+        }
+
+        // --- Layer Rotation Logic ---
+        function rotateLayer(axis, layerIndex, direction) {
+            if (isRotating) return; // Prevent overlapping animations
+            isRotating = true;
+
+            const rotationAngle = (Math.PI / 2) * direction; // 90 degrees in radians
+            const rotationAxis = new THREE.Vector3();
+            if (axis === 'x') rotationAxis.set(1, 0, 0);
+            if (axis === 'y') rotationAxis.set(0, 1, 0);
+            if (axis === 'z') rotationAxis.set(0, 0, 1);
+
+            const layerCubies = getCubiesInLayer(axis, layerIndex);
+
+            // Pivot point for rotation (center of the cube)
+            const pivot = new THREE.Object3D();
+            scene.add(pivot); // Temporarily add pivot to the scene
+
+            // Attach layer cubies to the pivot
+            layerCubies.forEach(cubie => {
+                // Convert cubie's world position to pivot's local space before attaching
+                 pivot.attach(cubie); // Use attach to maintain world transforms initially
+            });
+
+            // Animate the pivot's rotation
+            new TWEEN.Tween(pivot.rotation)
+                .to({ [axis]: pivot.rotation[axis] + rotationAngle }, 500) // 500ms duration
+                .easing(TWEEN.Easing.Quadratic.InOut)
+                .onComplete(() => {
+                    // Detach cubies from pivot and re-attach to the main scene (or cubeGroup)
+                    layerCubies.forEach(cubie => {
+                        // Cubie's world matrix is now updated by the pivot's rotation
+                        // Re-attach to the main scene graph (cubeGroup) to apply the transformation permanently
+                        cubeGroup.attach(cubie); // Use attach again
+
+                        // Update logical position (Optional but good for state tracking if needed later)
+                        // This part is complex - needs proper matrix math to update userData.logicalPosition accurately.
+                        // For visual-only rotation, we can skip precise logical position update for now.
+                        // Simple rounding might work for basic cases but isn't robust for complex states.
+                        // Example (approximate):
+                        // cubie.userData.logicalPosition = { x: Math.round(cubie.position.x), ... };
+                    });
+                    scene.remove(pivot); // Clean up the pivot
+                    isRotating = false; // Allow next rotation
+                })
+                .start();
+        }
+
+        // Helper to find cubies in a specific layer
+        function getCubiesInLayer(axis, layerIndex) {
+            const layerCubies = [];
+            const tolerance = 0.1; // Account for potential floating point inaccuracies
+
+            cubies.forEach(cubie => {
+                // Use the current world position relative to the cubeGroup center
+                const position = cubie.position[axis];
+                 // console.log(`Checking cubie at ${cubie.position[axis]} against layer ${layerIndex}`);
+                 if (Math.abs(position - layerIndex) < tolerance) {
+                    layerCubies.push(cubie);
+                }
+            });
+             // console.log(`Found ${layerCubies.length} cubies for layer ${axis}=${layerIndex}`);
+            return layerCubies;
+        }
+
+
+        // --- Animation Loop ---
+        function animate(time) {
+            requestAnimationFrame(animate);
+
+            TWEEN.update(time); // Update animations
+            controls.update(); // Required if enableDamping is true
+
+            renderer.render(scene, camera);
+        }
+
+        // --- Handle Window Resize ---
+        function onWindowResize() {
+            const container = document.getElementById('canvas-container');
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        // --- Start Everything ---
+        init();
+
+    </script>
 </body>
-
 </html>
